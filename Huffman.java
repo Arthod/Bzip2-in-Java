@@ -21,7 +21,7 @@ public class Huffman {
 
 		// Generating the Huffman tree and then the codes
 		Element root = huffmanTree(frequency);
-		generateCode(root, "");
+		generateCode(root);
 
 		// Writing frequency to file
 		for (int i = 0; i < 256; i++) {
@@ -115,4 +115,7 @@ public class Huffman {
 			codes[(int) e.getData()] = tempcode;
 		}
 	}
+    private static void generateCode(Element e) {
+		generateCode(e, "");
+    }
 }

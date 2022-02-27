@@ -28,14 +28,6 @@ class Test {
             encodingDuration = MoveToFrontArrayListReversed.testEncode(original, encoded);
             decodingDuration = MoveToFrontArrayListReversed.testDecode(encoded, out);
         });
-        dataStructureTypes.put("li", () -> {
-            encodingDuration = MoveToFrontList.testEncode(original, encoded);
-            decodingDuration = MoveToFrontList.testDecode(encoded, out);
-        });
-        dataStructureTypes.put("liR", () -> {
-            encodingDuration = MoveToFrontListReversed.testEncode(original, encoded);
-            decodingDuration = MoveToFrontListReversed.testDecode(encoded, out);
-        });
         dataStructureTypes.put("ar", () -> {
             encodingDuration = MoveToFrontArray.testEncode(original, encoded);
             decodingDuration = MoveToFrontArray.testDecode(encoded, out);
@@ -53,7 +45,7 @@ class Test {
         if (args[0].equals("help")) {
             System.out.println("test [dataStructureType] -f [filename]");
             System.out.println("test [dataStructureType] -n [random chars amount]");
-            System.out.println("dataStructureTypes: ll, al, alR, li, liR, ar, arR");
+            System.out.println("dataStructureTypes: ll, al, alR, ar, arR");
             return;
         } else if (args[0].equals("test")) {
             if (!dataStructureTypes.containsKey(args[1])) {

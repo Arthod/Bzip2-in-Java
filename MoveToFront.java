@@ -7,7 +7,7 @@ public class MoveToFront {
 
         // Reset array
         for (int i = 0; i < 256; i++) {
-            recentlyUsedSymbols[i] = 255 - i;
+            recentlyUsedSymbols[i] = i;
         }
         
         // Read inArr array char by char, find the index and insert it into the outArr array
@@ -17,7 +17,7 @@ public class MoveToFront {
             // Read from array (in)
             byteRead = inArr[i];
 
-            // Search the array (from right to left) for the byte
+            // Search the array for the byte
             for (int j = 0; j < 256; j++) {
                 if (recentlyUsedSymbols[j] == byteRead) {
                     indexOfByte = j;
@@ -25,13 +25,13 @@ public class MoveToFront {
                 }
             }
 
-            // Shift all indicies to the left, until element
-            for (int j = indexOfByte; j < 255; j++) {
-                recentlyUsedSymbols[j] = recentlyUsedSymbols[j + 1];
+            // Shift all indicies to the right, until element
+            for (int j = indexOfByte; j > 0; j--) {
+                recentlyUsedSymbols[j] = recentlyUsedSymbols[j - 1];
             }
 
-            // Replace last index with element
-            recentlyUsedSymbols[255] = byteRead;
+            // Replace first index with element
+            recentlyUsedSymbols[0] = byteRead;
             
             // Write to array (out)
             outArr[i] = indexOfByte;
@@ -46,7 +46,7 @@ public class MoveToFront {
 
         // Reset array
         for (int i = 0; i < 256; i++) {
-            recentlyUsedSymbols[i] = 255 - i;
+            recentlyUsedSymbols[i] = i;
         }
         
         // Read inArr array char by char, find the index and insert it into the outArr array
@@ -59,13 +59,13 @@ public class MoveToFront {
             // Get the byte in that index position of the byte read
             charOfByte = recentlyUsedSymbols[byteRead];
 
-            // Shift all indicies to the left, until element
-            for (int j = byteRead; j < 255; j++) {
-                recentlyUsedSymbols[j] = recentlyUsedSymbols[j + 1];
+            // Shift all indicies to the right, until element
+            for (int j = byteRead; j > 0; j--) {
+                recentlyUsedSymbols[j] = recentlyUsedSymbols[j - 1];
             }
 
-            // Replace last index with element
-            recentlyUsedSymbols[255] = charOfByte;
+            // Replace first index with element
+            recentlyUsedSymbols[0] = charOfByte;
 
             // Write to array (out)
             outArr[i] = charOfByte;

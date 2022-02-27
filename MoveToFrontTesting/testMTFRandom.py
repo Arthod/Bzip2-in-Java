@@ -15,8 +15,6 @@ types = {
     "al": "ArrayList",
     "alR": "ArrayListReversed",
     "ll": "LinkedList",
-    "li": "List",
-    "liR": "ListReversed",
     "ar": "Array",
     "arR": "ArrayReversed",
 }
