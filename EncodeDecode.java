@@ -1,24 +1,18 @@
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {        
 		// File input and bit output
 		String inFileName = args[0];
-		String outFileName = args[1];
-        String tempFileName = "temp.txt";
         String encodedFileName = "encoded.txt";
-        int[] out;
-        int[] encoded;
+        String outFileName = "decoded.txt";
 
         FileInputStream inFile = new FileInputStream(inFileName);
-        FileOutputStream tempFile = new FileOutputStream(tempFileName);
 
         // Turn inFile into array
         int bytesAmount = (int) inFile.getChannel().size();
-
-        // Init array with fixed length
         int[] original = new int[bytesAmount];
         
         // Iterate through all bytes in file and write to array
@@ -28,43 +22,40 @@ class EncodeDecode {
             original[i] = byteRead;
             i++;
         }
+        inFile.close();
 
-        // Start timer
-        long timeStart = System.nanoTime();
+
+        int[] tempArr = original;
+        tempArr = BWT.transform(tempArr);
+        writeToFile(outFileName, tempArr);
         
+        /*
         // Encode
-        encoded = MoveToFront.encode(original);
-        for (i = 0; i < encoded.length; i++) {
-            tempFile.write(encoded[i]);
-        }
-        Huffman.encode(tempFileName, encodedFileName);
+        int[] tempArr = original;
+        tempArr = MoveToFront.encode(tempArr);
+        tempArr = Huffman.encode(tempArr);
+
+        // Write encoded to file
+        writeToFile(encodedFileName, tempArr);
 
         // Decode
-        Huffman.decode(encodedFileName, tempFileName);
-        FileInputStream inTempFile = new FileInputStream(tempFileName);
-        i = 0;
-        while ((byteRead = inTempFile.read()) != -1) {
-            encoded[i] = byteRead;
-            i++;
-        }
+        tempArr = Huffman.decode(tempArr);
+        tempArr = MoveToFront.decode(tempArr);
 
-
-        MoveToFront.decode(tempFileName, outFileName);
-
-        // End timer
-        long duration = System.nanoTime() - timeStart;
-
-        // Print compression rate and time
-        File encodedFile = new File("encoded.txt"); 
-        System.out.println("--LL Compression finished--");
-        System.out.println("Time: " + duration/10e+8 + " s");
-        System.out.println("In File: " + inFile.getChannel().size() + " bytes");
-        System.out.println("Out File: " + encodedFile.length() + " bytes");
-        System.out.println("Compression: " + (float) encodedFile.length() / inFile.length());
-        
-        // Delete temp file
-        File tempFile = new File(tempFileName); 
-        tempFile.delete();
+        // Write out to file
+        writeToFile(outFileName, tempArr);
+        */
 	}
     
+    public static void writeToFile(String fileName, int[] arr) throws IOException {
+        FileOutputStream outFileStream = new FileOutputStream(fileName);
+
+        // Write int array to file
+        for (int i = 0; i < arr.length; i++) {
+            outFileStream.write(arr[i]);
+        }
+
+        // Close file
+        outFileStream.close();
+    }
 }

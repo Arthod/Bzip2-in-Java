@@ -1,51 +1,57 @@
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Huffman {
 	private static String[] codes = new String[256];
     private static int[] frequency = new int[256];
 
-    public static void encode(String inFileName, String outFileName) throws IOException {
-		// File input and bit output
-		FileInputStream inFile = new FileInputStream(inFileName);
-		FileOutputStream outFile = new FileOutputStream(outFileName);
-		BitOutputStream outBit = new BitOutputStream(outFile);
+    public static int[] encode(int[] inArr) throws IOException {
+		// Bit output
+		IntArrayOutputStream outArrayStream = new IntArrayOutputStream(inArr.length);
+		BitOutputStream outBit = new BitOutputStream(outArrayStream);
 
-		// Reading input file
-		int inputRead;
-		while ((inputRead = inFile.read()) != -1) {
-			frequency[inputRead]++;
-		}
+		// Reading input array
+        for (int i = 0; i < inArr.length; i++) {
+			frequency[inArr[i]]++;
+        }
 
 		// Generating the Huffman tree and then the codes
 		Element root = huffmanTree(frequency);
 		generateCode(root);
 
 		// Writing frequency to file
-		for (int i = 0; i < 256; i++) {
+		for (int i = 0; i < frequency.length; i++) {
 			outBit.writeInt(frequency[i]);
 		}
 
 		// Reading input file again, for every byte write its code bits to file
-		inFile.close();
-		inFile = new FileInputStream(inFileName);
-		while ((inputRead = inFile.read()) != -1) {
-			String code = codes[inputRead];
+        for (int i = 0; i < inArr.length; i++) {
+			String code = codes[inArr[i]];
 			for (int j = 0; j < code.length(); j++) {
 				outBit.writeBit(Character.getNumericValue(code.charAt(j)));
-			}
-		}
+			}            
+        }
+
+        
+        for (int i = 0; i < frequency.length; i++) {
+            if (frequency[i] > 0) {
+                System.out.println(i + ", " + codes[i] + ": " + frequency[i]);
+            }
+        }
+
+        // Close out bit stream
 		outBit.close();
-		inFile.close();
+
+        // Return byte array of outArrayStream
+        return outArrayStream.toIntArray();
     }
     
-    public static void decode(String inFileName, String outFileName) throws Exception {
-        // Bit input and file output
-        FileInputStream inFile = new FileInputStream(inFileName);
-        BitInputStream inBit = new BitInputStream(inFile);
-        FileOutputStream outFile = new FileOutputStream(outFileName);
+    public static int[] decode(int[] inArr) throws Exception {
+        // Bit input
+        IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
+        BitInputStream inBit = new BitInputStream(inArrayStream);
+        ArrayList<Integer> outList = new ArrayList<Integer>();
 
         // Read and sum the frequencies from file
         int sum = 0;
@@ -72,15 +78,18 @@ public class Huffman {
                     elementAt = ((Node) elementAt.getData()).getRight();
                 }
             } else {
-                outFile.write((int) elementAt.getData());
+                outList.add((int) elementAt.getData());
                 elementAt = root;
                 leafReachedCount++;
             }
         }
         
-        // Closing the files.
+        // Close in bit reader
         inBit.close();
-        outFile.close();
+
+        // TODO: Optimize later?
+        // https://stackoverflow.com/questions/718554/how-to-convert-an-arraylist-containing-integers-to-primitive-int-array
+        return outList.stream().mapToInt(i -> i).toArray();
     }
 
 	/*
