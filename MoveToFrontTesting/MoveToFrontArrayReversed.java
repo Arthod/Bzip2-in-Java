@@ -2,10 +2,6 @@ public class MoveToFrontArrayReversed {
     static long startTime;
     static long durationTime;
     private static int[] recentlyUsedSymbols = new int[256];
-
-    public MoveToFrontArrayReversed(String[] args) {
-        System.out.println("");
-    }
     
     public static long testEncode(int[] inArr, int[] outArr) {
         // Get start time

@@ -1,6 +1,7 @@
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {        
@@ -17,34 +18,47 @@ class EncodeDecode {
         
         // Iterate through all bytes in file and write to array
         int byteRead;
-        int i = 0;
+        int k = 0;
         while ((byteRead = inFile.read()) != -1) {
-            original[i] = byteRead;
-            i++;
+            original[k] = byteRead;
+            k++;
         }
         inFile.close();
 
-
-        int[] tempArr = original;
+        // Compression
+        int[] tempArr = original.clone();
+        System.out.println(original.length);
         tempArr = BWT.transform(tempArr);
-        writeToFile(outFileName, tempArr);
-        
-        /*
-        // Encode
-        int[] tempArr = original;
-        tempArr = MoveToFront.encode(tempArr);
-        tempArr = Huffman.encode(tempArr);
+        System.out.println(tempArr.length);
+        //tempArr = MoveToFront.encode(tempArr);
+        //tempArr = Huffman.encode(tempArr);
 
         // Write encoded to file
         writeToFile(encodedFileName, tempArr);
 
-        // Decode
-        tempArr = Huffman.decode(tempArr);
-        tempArr = MoveToFront.decode(tempArr);
+        // Decompression
+        //tempArr = Huffman.decode(tempArr);
+        //tempArr = MoveToFront.decode(tempArr);
+        tempArr = BWT.reverseTransform(tempArr);
+
 
         // Write out to file
         writeToFile(outFileName, tempArr);
-        */
+
+        // Check that compression/decompression returns same string
+        System.out.println(original.length);
+        System.out.println(tempArr.length);
+        if (tempArr.length != original.length) {
+            System.out.println("Not same length");
+            return;
+        }
+        for (int i = 0; i < tempArr.length; i++) {
+            if (tempArr[i] != original[i]) {
+                System.out.println(i);
+                System.out.println("Not equal");
+                return;
+            }
+        }
 	}
     
     public static void writeToFile(String fileName, int[] arr) throws IOException {

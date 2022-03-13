@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -5,17 +6,68 @@ import java.util.Comparator;
 import java.util.List;
 
 public class BWT {
+    public static int[] naiveTransform(int[] S) {
+        int N = S.length + 1;
+        // TODO.. make this more efficient
+        int[] SS = new int[S.length + 1];
+        for (int i = 0; i < S.length; i++) {
+            SS[i] = S[i];
+        }
+        SS[S.length] = 0;
+        S = SS;
 
-    public static int[] transform(int[] S) {
-        int N = S.length;
+
+        int[][] arrNew = new int[S.length][S.length];
+        
+        for (int i = 0; i < S.length; i++) {
+            for (int j = 0; j < S.length; j++) {
+                arrNew[i][j] = S[Math.floorMod(i + j, S.length)];
+            }
+        }
+
+        Arrays.sort(arrNew, (arr1,arr2) -> {
+            for (int i = 0; i < arr1.length; i++) {
+                if (arr1[i] != arr2[i]) {
+                    return arr1[i] - arr2[i];
+                }
+            }
+            return 0;
+        });
 
         
+        int[] outArr = new int[S.length + 1];
+        int rowId = 0;
+        for (int i = 0; i < outArr.length - 1; i++) {
+            outArr[i] = arrNew[i][S.length - 1];
+            if (outArr[i] == 0) {
+                rowId = i;
+            }
+        }
+        outArr[outArr.length - 1] = rowId;
+        
+        return outArr;
+    }
+
+    public static int[] transform(int[] S) {
+        int N = S.length + 1;
+
+
+        // Add a new byte that is first when sorted, 0 (that isn't in the string)
+        // TODO.. make this more efficient
+        int[] SS = new int[S.length + 1];
+        for (int i = 0; i < S.length; i++) {
+            SS[i] = S[i];
+        }
+        SS[S.length] = 0;
+        S = SS;
+
 
         // Create new array with k EOF characters at the end
         int[] sArr = new int[N + 4];
         for (int i = 0; i < N; i++) {
             sArr[i] = S[i];
         }
+
 
         // Append 4 characters to end of string
         for (int i = 0; i < 4; i++) {
@@ -62,16 +114,53 @@ public class BWT {
         
         // Now our V has the correctly sorted indicies of the square
         // Now we fetch the last column of the BWT square
-        int[] outArr = new int[N];
-        for (int i = 0; i < outArr.length; i++) {
+        // We also write the row index to the last index of the out array
+        int[] outArr = new int[N + 1];
+        for (int i = 0; i < outArr.length - 1; i++) {
             if (V[i] == 0) {
                 // i is the index of the row of the original string
+                outArr[outArr.length - 1] = i;
                 outArr[i] = S[S.length - 1];
             } else {
                 outArr[i] = S[V[i] - 1];
             }
         }
 
+        return outArr;
+    }
+
+    /*
+     *  Reverses the BWT transformation. Assumes the int in inArr is the row id of the original string
+     */
+    public static int[] reverseTransform(int[] inArr) {
+        // P[i] is the number of instances of character L[i] in L[0, 1, ..., i-1]
+        int[] P = new int[inArr.length - 1];
+
+        // count[ch] is the total number of instances in L, of characters preceding 
+        // character ch in the alphabet.
+        int[] count = new int[256];
+
+        // First pass - 
+        //  count[ch] is the amount of times ch appears in L.
+        //  P[i] is the number of 
+        for (int i = 0; i < inArr.length - 1; i++) {
+            P[i] = count[inArr[i]];
+            count[inArr[i]]++;
+        }
+
+        int sum = 0;
+        for (int i = 0; i < 256; i++) {
+            int j = count[i];
+            count[i] = sum;
+            sum += j;
+        }
+
+        int[] outArr = new int[inArr.length - 2];
+        int i = inArr[inArr.length - 1];
+        for (int j = inArr.length - 3; j >= 0; j--) {
+            outArr[j] = inArr[i];
+            i = P[i] + count[inArr[i]];
+        }
 
         return outArr;
     }
@@ -83,7 +172,7 @@ public class BWT {
 
     private static int[] sortIndexArray(int[] comparedArray, ArrayList<Integer> indexList) {
         // Q4 - Create index array V and sort it using
-        // the first two characters of S as sort keys   
+        // the first two characters of S as sort keys
 
         // Sort V based on the characters    TODO, implement comparison of first two characters in a better way (or correctly).
         Collections.sort(indexList, (i1, i2) -> 255 * (comparedArray[i1] - comparedArray[i2]) + (comparedArray[i1 + 1] - comparedArray[i2 + 1]));
@@ -114,17 +203,18 @@ public class BWT {
         int i = startIndex - 1;
 
         for (int j = startIndex; j <= endIndex - 1; j++) {
-            // TODO comparison should not only be on 1 word, but on all words until biggest one found.
 
-            for (int k = 0; k < comparedArray.length; k += 4) {
+            int indexLimit = Math.max(indexArray[j], pivot);
+            for (int k = 0; k < comparedArray.length - indexLimit; k += 4) {
+
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
-                    // If they are not equal, check comparison, and swap if greater than pivot
-                    if (comparedArray[indexArray[j] + k] > comparedArray[pivot + k]) {
+                // If they are not equal, check comparison, and swap if greater than pivot
+                    if (comparedArray[indexArray[j] + k] <= comparedArray[pivot + k]) {
                         i++;
                         swap(indexArray, j, i);
-                        break;
                     }
+                    break;
                 }
             }
             /*
