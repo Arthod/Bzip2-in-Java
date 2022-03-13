@@ -144,6 +144,7 @@ public class BWT {
         //  count[ch] is the amount of times ch appears in L.
         //  P[i] is the number of 
         for (int i = 0; i < inArr.length - 1; i++) {
+            
             P[i] = count[inArr[i]];
             count[inArr[i]]++;
         }
@@ -155,9 +156,9 @@ public class BWT {
             sum += j;
         }
 
-        int[] outArr = new int[inArr.length - 2];
+        int[] outArr = new int[inArr.length - 1];
         int i = inArr[inArr.length - 1];
-        for (int j = inArr.length - 3; j >= 0; j--) {
+        for (int j = inArr.length - 2; j >= 0; j--) {
             outArr[j] = inArr[i];
             i = P[i] + count[inArr[i]];
         }

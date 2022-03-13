@@ -21,6 +21,9 @@ class EncodeDecode {
         int k = 0;
         while ((byteRead = inFile.read()) != -1) {
             original[k] = byteRead;
+            if (byteRead == 0) {
+                System.out.println("zero found");
+            }
             k++;
         }
         inFile.close();
@@ -54,8 +57,7 @@ class EncodeDecode {
         }
         for (int i = 0; i < tempArr.length; i++) {
             if (tempArr[i] != original[i]) {
-                System.out.println(i);
-                System.out.println("Not equal");
+                System.out.println("Not equal at index " + i);
                 return;
             }
         }
