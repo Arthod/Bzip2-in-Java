@@ -13,7 +13,11 @@ public class Huffman {
 
 		// Reading input array
         for (int i = 0; i < inArr.length; i++) {
-			frequency[inArr[i]]++;
+            try {
+                frequency[inArr[i]]++;
+            } catch(Exception e) {
+                System.out.println("error reading input. at index: " + i + ", read int: " + inArr[i]);
+            }
         }
 
 		// Generating the Huffman tree and then the codes

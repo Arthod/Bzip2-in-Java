@@ -81,11 +81,54 @@ public class BWT {
         }
         
         // Array V  Q4
+        // Sort by first two characters using radix sort using counting sort
+        int[] count = new int[256];
+        int[] V_temp = new int[S.length];
+        int[] V = new int[S.length];
+        int k;
+        
+        /// Sort by second character
+        // Count amount of characters
+        for (int i = 0; i < W.length; i++) {
+            count[sArr[i + 1]]++;
+        }
+        // For each index, add the previous index
+        for (int i = 1; i < 256; i++) {
+            count[i] = count[i] + count[i - 1];
+        }
+        // Go in reverse, and write the index
+        for (int i = S.length - 1; i >= 0; i--) {
+            k = sArr[i + 1];
+            V_temp[count[k] - 1] = i;
+            count[k]--;
+        }
+
+        // Sort by first characterv
+        // Count amount of characters
+        count = new int[256];
+        for (int i = 0; i < W.length; i++) {
+            count[sArr[i]]++;
+        }
+        // For each index, add the previous index
+        for (int i = 1; i < 256; i++) {
+            count[i] = count[i] + count[i - 1];
+        }
+        // Go in reverse, and write the index of the index
+        for (int i = S.length - 1; i >= 0; i--) {
+            k = sArr[V_temp[i]];
+            V[count[k] - 1] = V_temp[i];
+            count[k]--;
+        }
+        
+
+        /*
         ArrayList<Integer> indexList = new ArrayList<Integer>(W.length);// new int[S.length];
         for (int i = 0; i < W.length; i++) {
             indexList.add(i);
         }
-        int[] V = sortIndexArray(sArr, indexList);
+        int[] V3 = sortIndexArray(sArr, indexList);
+        System.out.println("V:  " + Arrays.toString(V3));
+        */
 
         // Q5
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
@@ -156,9 +199,10 @@ public class BWT {
             sum += j;
         }
 
-        int[] outArr = new int[inArr.length - 1];
+        int[] outArr = new int[inArr.length - 2];
         int i = inArr[inArr.length - 1];
-        for (int j = inArr.length - 2; j >= 0; j--) {
+        i = P[i] + count[inArr[i]];
+        for (int j = outArr.length - 1; j >= 0; j--) {
             outArr[j] = inArr[i];
             i = P[i] + count[inArr[i]];
         }
@@ -171,6 +215,7 @@ public class BWT {
         return ((a << 24) + (b << 16) + (c << 8) + (d << 0));
     }
 
+    /*
     private static int[] sortIndexArray(int[] comparedArray, ArrayList<Integer> indexList) {
         // Q4 - Create index array V and sort it using
         // the first two characters of S as sort keys
@@ -187,6 +232,7 @@ public class BWT {
 
         return indexArray;
     }
+    */
 
     private static void quicksortIndexArray(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
         // In-place implementation of quicksort that sorts an index 
@@ -205,6 +251,7 @@ public class BWT {
 
         for (int j = startIndex; j <= endIndex - 1; j++) {
 
+            // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);
             for (int k = 0; k < comparedArray.length - indexLimit; k += 4) {
 
