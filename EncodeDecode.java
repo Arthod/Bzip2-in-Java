@@ -31,17 +31,19 @@ class EncodeDecode {
 
         // Compression
         int[] tempArr = original.clone();
-        //tempArr = BWT.transform(tempArr);
+        tempArr = BWT.transform(tempArr);
+        System.out.println(Arrays.toString(tempArr));
         tempArr = MoveToFront.encode(tempArr);
-        tempArr = Huffman.encode(tempArr);
+        //tempArr = Huffman.encode(tempArr);
 
         // Write encoded to file
         writeToFile(encodedFileName, tempArr);
 
         // Decompression
-        tempArr = Huffman.decode(tempArr);
+        //tempArr = Huffman.decode(tempArr);
         tempArr = MoveToFront.decode(tempArr);
-        //tempArr = BWT.reverseTransform(tempArr);
+        tempArr = BWT.reverseTransform(tempArr);
+        System.out.println(tempArr.length);
 
 
         // Write out to file

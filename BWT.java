@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class BWT {
+    private static final int unusedByte = 0;
+
     public static int[] naiveTransform(int[] S) {
         int N = S.length + 1;
         // TODO.. make this more efficient
@@ -13,7 +15,7 @@ public class BWT {
         for (int i = 0; i < S.length; i++) {
             SS[i] = S[i];
         }
-        SS[S.length] = 0;
+        SS[S.length] = unusedByte;
         S = SS;
 
 
@@ -39,7 +41,7 @@ public class BWT {
         int rowId = 0;
         for (int i = 0; i < outArr.length - 1; i++) {
             outArr[i] = arrNew[i][S.length - 1];
-            if (outArr[i] == 0) {
+            if (outArr[i] == unusedByte) {
                 rowId = i;
             }
         }
@@ -58,7 +60,7 @@ public class BWT {
         for (int i = 0; i < S.length; i++) {
             SS[i] = S[i];
         }
-        SS[S.length] = 0;
+        SS[S.length] = unusedByte;
         S = SS;
 
 
@@ -71,7 +73,7 @@ public class BWT {
 
         // Append 4 characters to end of string
         for (int i = 0; i < 4; i++) {
-            sArr[N + i] = 0;
+            sArr[N + i] = unusedByte;
         }
 
         // Create array W of N words. Pack 4 bytes into 1 word (integer)    Q2
@@ -160,7 +162,7 @@ public class BWT {
         // We also write the row index to the last index of the out array
         int[] outArr = new int[N + 1];
         for (int i = 0; i < outArr.length - 1; i++) {
-            if (V[i] == 0) {
+            if (V[i] == unusedByte) {
                 // i is the index of the row of the original string
                 outArr[outArr.length - 1] = i;
                 outArr[i] = S[S.length - 1];
@@ -187,7 +189,6 @@ public class BWT {
         //  count[ch] is the amount of times ch appears in L.
         //  P[i] is the number of 
         for (int i = 0; i < inArr.length - 1; i++) {
-            
             P[i] = count[inArr[i]];
             count[inArr[i]]++;
         }
