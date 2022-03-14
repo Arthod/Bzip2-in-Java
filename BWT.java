@@ -51,42 +51,28 @@ public class BWT {
     }
 
     public static int[] transform(int[] S) {
-        int N = S.length + 1;
-
-
-        // Add a new byte that is first when sorted, 0 (that isn't in the string)
-        // TODO.. make this more efficient
-        int[] SS = new int[S.length + 1];
+        // Create new array with k=5 EOF characters at the end
+        int[] sArr = new int[S.length + 5];
         for (int i = 0; i < S.length; i++) {
-            SS[i] = S[i];
-        }
-        SS[S.length] = unusedByte;
-        S = SS;
-
-
-        // Create new array with k EOF characters at the end
-        int[] sArr = new int[N + 4];
-        for (int i = 0; i < N; i++) {
             sArr[i] = S[i];
         }
-
-
-        // Append 4 characters to end of string
-        for (int i = 0; i < 4; i++) {
-            sArr[N + i] = unusedByte;
+        // Append 5 characters to end of string
+        for (int i = 0; i < 5; i++) {
+            sArr[sArr.length - 5 + i] = unusedByte;
         }
+        System.out.println(Arrays.toString(sArr));
 
         // Create array W of N words. Pack 4 bytes into 1 word (integer)    Q2
-        int[] W = new int[N];
-        for (int i = 0; i < N; i++) {
+        int[] W = new int[S.length + 1];
+        for (int i = 0; i < W.length; i++) {
             W[i] = bytesToWords(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3]);
         }
         
         // Array V  Q4
         // Sort by first two characters using radix sort using counting sort
         int[] count = new int[256];
-        int[] V_temp = new int[S.length];
-        int[] V = new int[S.length];
+        int[] V_temp = new int[W.length];
+        int[] V = new int[W.length];
         int k;
         
         /// Sort by second character
@@ -99,7 +85,7 @@ public class BWT {
             count[i] = count[i] + count[i - 1];
         }
         // Go in reverse, and write the index
-        for (int i = S.length - 1; i >= 0; i--) {
+        for (int i = W.length - 1; i >= 0; i--) {
             k = sArr[i + 1];
             V_temp[count[k] - 1] = i;
             count[k]--;
@@ -116,7 +102,7 @@ public class BWT {
             count[i] = count[i] + count[i - 1];
         }
         // Go in reverse, and write the index of the index
-        for (int i = S.length - 1; i >= 0; i--) {
+        for (int i = W.length - 1; i >= 0; i--) {
             k = sArr[V_temp[i]];
             V[count[k] - 1] = V_temp[i];
             count[k]--;
@@ -135,9 +121,9 @@ public class BWT {
         // Q5
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
-        for (int ch1 = 0; ch1 < 256 && amountComparedEqualTotal < S.length - 1; ch1++) {
+        for (int ch1 = 0; ch1 < 256 && amountComparedEqualTotal < W.length - 1; ch1++) {
             // Q6
-            for (int ch2 = 0; ch2 < 256 && amountComparedEqualTotal < S.length - 1; ch2++) {
+            for (int ch2 = 0; ch2 < 256 && amountComparedEqualTotal < W.length - 1; ch2++) {
                 // We know that V is sorted by the first two characters
                 first = amountComparedEqualTotal;
                 
@@ -145,7 +131,7 @@ public class BWT {
                     amountComparedEqualTotal++;
                     
                     // If reached end of input, stop all
-                    if (amountComparedEqualTotal == S.length - 1) {
+                    if (amountComparedEqualTotal == W.length - 1) {
                         break;
                     }
                 }
@@ -160,14 +146,14 @@ public class BWT {
         // Now our V has the correctly sorted indicies of the square
         // Now we fetch the last column of the BWT square
         // We also write the row index to the last index of the out array
-        int[] outArr = new int[N + 1];
+        int[] outArr = new int[W.length + 1];
         for (int i = 0; i < outArr.length - 1; i++) {
             if (V[i] == unusedByte) {
                 // i is the index of the row of the original string
                 outArr[outArr.length - 1] = i;
-                outArr[i] = S[S.length - 1];
+                outArr[i] = sArr[W.length - 1];
             } else {
-                outArr[i] = S[V[i] - 1];
+                outArr[i] = sArr[V[i] - 1];
             }
         }
 
