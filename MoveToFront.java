@@ -17,6 +17,11 @@ public class MoveToFront {
             // Read from array (in)
             byteRead = inArr[i];
 
+            // DEBUG
+            if (byteRead > 255) {
+                System.out.println("MTF can't handle non 8-bit values");
+            }
+
             // Search the array for the byte
             for (int j = 0; j < 256; j++) {
                 if (recentlyUsedSymbols[j] == byteRead) {

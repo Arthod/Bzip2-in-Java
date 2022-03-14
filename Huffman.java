@@ -13,11 +13,7 @@ public class Huffman {
 
 		// Reading input array
         for (int i = 0; i < inArr.length; i++) {
-            try {
-                frequency[inArr[i]]++;
-            } catch(Exception e) {
-                System.out.println("error reading input. at index: " + i + ", read int: " + inArr[i]);
-            }
+            frequency[inArr[i]]++;
         }
 
 		// Generating the Huffman tree and then the codes
@@ -36,14 +32,6 @@ public class Huffman {
 				outBit.writeBit(Character.getNumericValue(code.charAt(j)));
 			}            
         }
-
-        /*
-        for (int i = 0; i < frequency.length; i++) {
-            if (frequency[i] > 0) {
-                System.out.println(i + ", " + codes[i] + ": " + frequency[i]);
-            }
-        }
-        */
 
         // Close out bit stream
 		outBit.close();
@@ -67,6 +55,15 @@ public class Huffman {
 
         // Generate Huffman tree
         Element root = huffmanTree(frequency);
+
+        // DEBUG
+        /*
+        for (int i = 0; i < frequency.length; i++) {
+            if (frequency[i] > 0) {
+                System.out.println(i + ", " + codes[i] + ": " + frequency[i]);
+            }
+        }
+        */
 
         // Decoding the codes and writing data to the out-file.
         Element elementAt = root;

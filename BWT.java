@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 public class BWT {
     private static final int unusedByte = 0;
+    private static Random random = new Random();
 
     public static int[] naiveTransform(int[] S) {
         int N = S.length + 1;
@@ -60,7 +62,6 @@ public class BWT {
         for (int i = 0; i < 5; i++) {
             sArr[sArr.length - 5 + i] = unusedByte;
         }
-        System.out.println(Arrays.toString(sArr));
 
         // Create array W of N words. Pack 4 bytes into 1 word (integer)    Q2
         int[] W = new int[S.length + 1];
@@ -91,7 +92,7 @@ public class BWT {
             count[k]--;
         }
 
-        // Sort by first characterv
+        // Sort by first character
         // Count amount of characters
         count = new int[256];
         for (int i = 0; i < W.length; i++) {
@@ -156,7 +157,6 @@ public class BWT {
                 outArr[i] = sArr[V[i] - 1];
             }
         }
-
         return outArr;
     }
 
@@ -198,7 +198,7 @@ public class BWT {
     }
 
     private static int bytesToWords(int a, int b, int c, int d) {
-        // Big endian
+        // Big endian   | instead of +
         return ((a << 24) + (b << 16) + (c << 8) + (d << 0));
     }
 
@@ -227,9 +227,15 @@ public class BWT {
         if (startIndex >= endIndex) {
             return;
         }
-        int q = partition(indexArray, comparedArray, startIndex, endIndex);
+        int q = randomizedPartition(indexArray, comparedArray, startIndex, endIndex);
         quicksortIndexArray(indexArray, comparedArray, startIndex, q - 1);
         quicksortIndexArray(indexArray, comparedArray, q + 1, endIndex);
+    }
+
+    private static int randomizedPartition(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
+        int randomIndex = random.nextInt(endIndex - startIndex + 1) + startIndex;
+        swap(indexArray, endIndex, randomIndex);
+        return partition(indexArray, comparedArray, startIndex, endIndex);
     }
 
     private static int partition(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {

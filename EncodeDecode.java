@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+// Issue: when BWT transforming, if there are more than 256 rows, the original rowId
+//      can exceed 255, which when used in MTF results in error and inconsistent behavior
+// Issue: Huffman encoding and decoding. Should be from file to file. Error
+//      happens when I use arrays.
+
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {        
 		// File input and bit output
@@ -11,59 +16,41 @@ class EncodeDecode {
         String encodedFileName = "encoded.txt";
         String outFileName = "decoded.txt";
 
-        FileInputStream inFile = new FileInputStream(inFileName);
-
-        // Turn inFile into array
-        int bytesAmount = (int) inFile.getChannel().size();
-        int[] original = new int[bytesAmount];
-        
-        // Iterate through all bytes in file and write to array
-        int byteRead;
-        int k = 0;
-        while ((byteRead = inFile.read()) != -1) {
-            original[k] = byteRead;
-            if (byteRead == 0) {
-                System.out.println("zero found");
-            }
-            k++;
-        }
-        inFile.close();
+        int[] inArr = readFile(inFileName);
 
         // Compression
-        int[] tempArr = original.clone();
+        int[] tempArr = inArr.clone();
         tempArr = BWT.transform(tempArr);
-        System.out.println(Arrays.toString(tempArr));
         tempArr = MoveToFront.encode(tempArr);
-        //tempArr = Huffman.encode(tempArr);
+        tempArr = Huffman.encode(tempArr);
 
-        // Write encoded to file
+        // Write encoded to file, and read again from it (this step is required for Huffman encoding to work (for some reason...))
         writeToFile(encodedFileName, tempArr);
+        tempArr = readFile(encodedFileName);
 
         // Decompression
-        //tempArr = Huffman.decode(tempArr);
+        tempArr = Huffman.decode(tempArr);
         tempArr = MoveToFront.decode(tempArr);
         tempArr = BWT.reverseTransform(tempArr);
-        System.out.println(tempArr.length);
-
-
+        
         // Write out to file
         writeToFile(outFileName, tempArr);
 
         // Check that compression/decompression returns same string
-        if (tempArr.length != original.length) {
+        if (tempArr.length != inArr.length) {
             System.out.println("Not same length");
             return;
         }
 
         for (int i = 0; i < tempArr.length; i++) {
-            if (tempArr[i] != original[i]) {
+            if (tempArr[i] != inArr[i]) {
                 System.out.print("Not equal at index " + i + ", where \"");
                 for (int j = 0; j < 5; j++) {
                     System.out.print(new String(new byte[] {(byte) tempArr[i + j]}));
                 }
                 System.out.print("\" =/= \"");
                 for (int j = 0; j < 5; j++) {
-                    System.out.print(new String(new byte[] {(byte) original[i + j]}));
+                    System.out.print(new String(new byte[] {(byte) inArr[i + j]}));
                 }
                 System.out.println("\"");
                 return;
@@ -71,6 +58,25 @@ class EncodeDecode {
         }
 	}
     
+    private static int[] readFile(String inFileName) throws Exception {
+        FileInputStream inFile = new FileInputStream(inFileName);
+
+        // Turn inFile into array
+        int bytesAmount = (int) inFile.getChannel().size();
+        int[] arr = new int[bytesAmount];
+        
+        // Iterate through all bytes in file and write to array
+        int byteRead = 0;
+        int k = 0;
+        while ((byteRead = inFile.read()) != -1) {
+            arr[k] = byteRead;
+            k++;
+        }
+        inFile.close();
+
+        return arr;
+    }
+
     public static void writeToFile(String fileName, int[] arr) throws IOException {
         FileOutputStream outFileStream = new FileOutputStream(fileName);
 
