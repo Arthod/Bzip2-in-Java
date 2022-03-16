@@ -1,3 +1,4 @@
+import java.net.http.WebSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,10 +8,10 @@ import java.util.List;
 import java.util.Random;
 
 public class BWT {
-    private static final int unusedByte = 0;
+    private static final int unusedByte = -1;  // The character that does not appear in our string
     private static Random random = new Random();
 
-    public static int[] naiveTransform(int[] S) {
+    public static int[] naiveTransform(int[] S, int[] rowId) {
         int N = S.length + 1;
         // TODO.. make this more efficient
         int[] SS = new int[S.length + 1];
@@ -39,39 +40,36 @@ public class BWT {
         });
 
         
-        int[] outArr = new int[S.length + 1];
-        int rowId = 0;
-        for (int i = 0; i < outArr.length - 1; i++) {
+        int[] outArr = new int[S.length];
+        for (int i = 0; i < outArr.length; i++) {
             outArr[i] = arrNew[i][S.length - 1];
-            if (outArr[i] == unusedByte) {
-                rowId = i;
+            if (outArr[i] == 0) {
+                rowId[0] = i;
             }
         }
-        outArr[outArr.length - 1] = rowId;
         
         return outArr;
     }
 
-    public static int[] transform(int[] S) {
-        // Create new array with k=5 EOF characters at the end
-        int[] sArr = new int[S.length + 5];
+    public static int[] transform(int[] S, int[] rowId) {
+        // Create new array with k=3 EOF characters at the end
+        int[] sArr = new int[S.length + 3];
         for (int i = 0; i < S.length; i++) {
             sArr[i] = S[i];
         }
-        // Append 5 characters to end of string
-        for (int i = 0; i < 5; i++) {
-            sArr[sArr.length - 5 + i] = unusedByte;
-        }
+        sArr[sArr.length - 1] = unusedByte;
+        sArr[sArr.length - 2] = unusedByte;
+        sArr[sArr.length - 3] = unusedByte;
 
         // Create array W of N words. Pack 4 bytes into 1 word (integer)    Q2
-        int[] W = new int[S.length + 1];
+        int[] W = new int[S.length];
         for (int i = 0; i < W.length; i++) {
             W[i] = bytesToWords(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3]);
         }
         
         // Array V  Q4
         // Sort by first two characters using radix sort using counting sort
-        int[] count = new int[256];
+        int[] count = new int[257];
         int[] V_temp = new int[W.length];
         int[] V = new int[W.length];
         int k;
@@ -79,27 +77,27 @@ public class BWT {
         /// Sort by second character
         // Count amount of characters
         for (int i = 0; i < W.length; i++) {
-            count[sArr[i + 1]]++;
+            count[sArr[i + 1] + 1]++;
         }
         // For each index, add the previous index
-        for (int i = 1; i < 256; i++) {
+        for (int i = 1; i < 257; i++) {
             count[i] = count[i] + count[i - 1];
         }
         // Go in reverse, and write the index
         for (int i = W.length - 1; i >= 0; i--) {
-            k = sArr[i + 1];
+            k = sArr[i + 1] + 1;
             V_temp[count[k] - 1] = i;
             count[k]--;
         }
 
         // Sort by first character
         // Count amount of characters
-        count = new int[256];
+        count = new int[257];
         for (int i = 0; i < W.length; i++) {
             count[sArr[i]]++;
         }
         // For each index, add the previous index
-        for (int i = 1; i < 256; i++) {
+        for (int i = 1; i < 257; i++) {
             count[i] = count[i] + count[i - 1];
         }
         // Go in reverse, and write the index of the index
@@ -108,90 +106,108 @@ public class BWT {
             V[count[k] - 1] = V_temp[i];
             count[k]--;
         }
-        
-
-        /*
-        ArrayList<Integer> indexList = new ArrayList<Integer>(W.length);// new int[S.length];
-        for (int i = 0; i < W.length; i++) {
-            indexList.add(i);
-        }
-        int[] V3 = sortIndexArray(sArr, indexList);
-        System.out.println("V:  " + Arrays.toString(V3));
-        */
 
         // Q5
+        int i = 0;
+        while (i < V.length - 1) {
+            int ch1 = sArr[V[i]];
+            int ch2 = sArr[V[i] + 1];
+            int j = i + 1;
+            while (j < V.length && ch1 == sArr[V[j]] && ch2 == sArr[V[j] + 1]) {
+                j++;
+            }
+
+            if (j > i + 1) {
+                quicksortIndexArray(V, W, i, j - 1);
+            }
+
+            i++;
+        }
+        /*
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
-        for (int ch1 = 0; ch1 < 256 && amountComparedEqualTotal < W.length - 1; ch1++) {
+        for (int ch1 = 97; ch1 < 101 && amountComparedEqualTotal < S.length; ch1++) {
             // Q6
-            for (int ch2 = 0; ch2 < 256 && amountComparedEqualTotal < W.length - 1; ch2++) {
+            for (int ch2 = 97; ch2 < 101 && amountComparedEqualTotal < S.length; ch2++) {
                 // We know that V is sorted by the first two characters
                 first = amountComparedEqualTotal;
                 
+
+                System.out.println("Trying " + ch1 + ", " + ch2);
                 while (ch1 == sArr[V[amountComparedEqualTotal]] && ch2 == sArr[V[amountComparedEqualTotal] + 1]) {
                     amountComparedEqualTotal++;
+                    System.out.println(amountComparedEqualTotal);
                     
                     // If reached end of input, stop all
-                    if (amountComparedEqualTotal == W.length - 1) {
+                    if (amountComparedEqualTotal == S.length) {
+                        System.out.println("Breaking");
                         break;
                     }
                 }
 
                 // If there's atleast two that are compared equal we need to sort them.
                 if (amountComparedEqualTotal - first >= 2) {
+                    System.out.println(V[first] + ", " + V[amountComparedEqualTotal - 1]);
                     quicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
             }
-        }
+        }*/
         
         // Now our V has the correctly sorted indicies of the square
         // Now we fetch the last column of the BWT square
         // We also write the row index to the last index of the out array
-        int[] outArr = new int[W.length + 1];
-        for (int i = 0; i < outArr.length - 1; i++) {
-            if (V[i] == unusedByte) {
+        System.out.println(Arrays.toString(V));
+        int[] outArr = new int[W.length];
+        int zeroSeen = 1;
+        for (i = 0; i < outArr.length; i++) {
+            if (V[i] == 0) {
                 // i is the index of the row of the original string
-                outArr[outArr.length - 1] = i;
-                outArr[i] = sArr[W.length - 1];
+                rowId[0] = i + 1;
+                zeroSeen = 0;
             } else {
-                outArr[i] = sArr[V[i] - 1];
+                outArr[i + zeroSeen] = S[V[i] - 1];
             }
         }
+        outArr[0] = S[S.length - 1];
+
         return outArr;
     }
 
     /*
      *  Reverses the BWT transformation. Assumes the int in inArr is the row id of the original string
      */
-    public static int[] reverseTransform(int[] inArr) {
+    public static int[] reverseTransform(int[] inArr, int rowId) {
+        System.out.println(rowId);
         // P[i] is the number of instances of character L[i] in L[0, 1, ..., i-1]
-        int[] P = new int[inArr.length - 1];
+        int[] P = new int[inArr.length];
 
         // count[ch] is the total number of instances in L, of characters preceding 
         // character ch in the alphabet.
-        int[] count = new int[256];
+        int[] count = new int[257];
 
         // First pass - 
         //  count[ch] is the amount of times ch appears in L.
-        //  P[i] is the number of 
-        for (int i = 0; i < inArr.length - 1; i++) {
-            P[i] = count[inArr[i]];
-            count[inArr[i]]++;
+        //  P[i] is the number of
+        for (int i = 0; i < inArr.length; i++) {
+            P[i] = count[inArr[i] + 1];
+            count[inArr[i] + 1]++;
         }
+        count[0]++;
+        System.out.println(Arrays.toString(P));
 
         int sum = 0;
-        for (int i = 0; i < 256; i++) {
-            int j = count[i];
-            count[i] = sum;
-            sum += j;
+        for (int i = 0; i < count.length; i++) {
+            sum += count[i];
+            count[i] = sum - count[i];
         }
+        System.out.println(Arrays.toString(count));
 
-        int[] outArr = new int[inArr.length - 2];
-        int i = inArr[inArr.length - 1];
-        i = P[i] + count[inArr[i]];
+        int[] outArr = new int[inArr.length];
+        int i = rowId;
+        i = P[i] + count[inArr[i] + 1];
         for (int j = outArr.length - 1; j >= 0; j--) {
             outArr[j] = inArr[i];
-            i = P[i] + count[inArr[i]];
+            i = P[i] + count[inArr[i] + 1];
         }
 
         return outArr;

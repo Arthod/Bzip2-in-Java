@@ -20,18 +20,26 @@ class EncodeDecode {
 
         // Compression
         int[] tempArr = inArr.clone();
-        tempArr = BWT.transform(tempArr);
-        tempArr = MoveToFront.encode(tempArr);
-        tempArr = Huffman.encode(tempArr);
+        int[] rowId = new int[1];
+        int[] rowId2 = new int[1];
+        int[] tempArr2 = BWT.naiveTransform(tempArr, rowId2);
+        tempArr = BWT.transform(tempArr, rowId);
+
+        System.out.println(Arrays.toString(tempArr2));
+        System.out.println(Arrays.toString(tempArr));
+
+        System.out.println("rowId: " + rowId[0]);
+        //tempArr = MoveToFront.encode(tempArr);
+        //tempArr = Huffman.encode(tempArr);
 
         // Write encoded to file, and read again from it (this step is required for Huffman encoding to work (for some reason...))
         writeToFile(encodedFileName, tempArr);
         tempArr = readFile(encodedFileName);
 
         // Decompression
-        tempArr = Huffman.decode(tempArr);
-        tempArr = MoveToFront.decode(tempArr);
-        tempArr = BWT.reverseTransform(tempArr);
+        //tempArr = Huffman.decode(tempArr);
+        //tempArr = MoveToFront.decode(tempArr);
+        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
         writeToFile(outFileName, tempArr);
