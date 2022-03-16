@@ -56,14 +56,6 @@ public class Huffman {
         // Generate Huffman tree
         Element root = huffmanTree(frequency);
 
-        // DEBUG
-        /*
-        for (int i = 0; i < frequency.length; i++) {
-            if (frequency[i] > 0) {
-                System.out.println(i + ", " + codes[i] + ": " + frequency[i]);
-            }
-        }
-        */
 
         // Decoding the codes and writing data to the out-file.
         Element elementAt = root;

@@ -53,6 +53,7 @@ public class BWT {
 
     public static int[] transform(int[] S, int[] rowId) {
         // Create new array with k=3 EOF characters at the end
+        System.out.println("1");
         int[] sArr = new int[S.length + 3];
         for (int i = 0; i < S.length; i++) {
             sArr[i] = S[i];
@@ -61,12 +62,14 @@ public class BWT {
         sArr[sArr.length - 2] = unusedByte;
         sArr[sArr.length - 3] = unusedByte;
 
+        System.out.println("2");
         // Create array W of N words. Pack 4 bytes into 1 word (integer)    Q2
         int[] W = new int[S.length];
         for (int i = 0; i < W.length; i++) {
             W[i] = bytesToWords(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3]);
         }
         
+        System.out.println("3");
         // Array V  Q4
         // Sort by first two characters using radix sort using counting sort
         int[] count = new int[257];
@@ -74,6 +77,7 @@ public class BWT {
         int[] V = new int[W.length];
         int k;
         
+        System.out.println("4");
         /// Sort by second character
         // Count amount of characters
         for (int i = 0; i < W.length; i++) {
@@ -90,6 +94,7 @@ public class BWT {
             count[k]--;
         }
 
+        System.out.println("5");
         // Sort by first character
         // Count amount of characters
         count = new int[257];
@@ -107,7 +112,9 @@ public class BWT {
             count[k]--;
         }
 
+        System.out.println("6");
         // Q5
+        /*
         int i = 0;
         while (i < V.length - 1) {
             int ch1 = sArr[V[i]];
@@ -123,43 +130,40 @@ public class BWT {
 
             i++;
         }
-        /*
+        */
+    
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
-        for (int ch1 = 97; ch1 < 101 && amountComparedEqualTotal < S.length; ch1++) {
+        for (int ch1 = -1; ch1 < 256 && amountComparedEqualTotal < S.length; ch1++) {
             // Q6
-            for (int ch2 = 97; ch2 < 101 && amountComparedEqualTotal < S.length; ch2++) {
+            for (int ch2 = -1; ch2 < 256 && amountComparedEqualTotal < S.length; ch2++) {
                 // We know that V is sorted by the first two characters
                 first = amountComparedEqualTotal;
                 
 
-                System.out.println("Trying " + ch1 + ", " + ch2);
                 while (ch1 == sArr[V[amountComparedEqualTotal]] && ch2 == sArr[V[amountComparedEqualTotal] + 1]) {
                     amountComparedEqualTotal++;
-                    System.out.println(amountComparedEqualTotal);
                     
                     // If reached end of input, stop all
                     if (amountComparedEqualTotal == S.length) {
-                        System.out.println("Breaking");
                         break;
                     }
                 }
 
                 // If there's atleast two that are compared equal we need to sort them.
                 if (amountComparedEqualTotal - first >= 2) {
-                    System.out.println(V[first] + ", " + V[amountComparedEqualTotal - 1]);
                     quicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
             }
-        }*/
+        }
         
+        System.out.println("7");
         // Now our V has the correctly sorted indicies of the square
         // Now we fetch the last column of the BWT square
         // We also write the row index to the last index of the out array
-        System.out.println(Arrays.toString(V));
         int[] outArr = new int[W.length];
         int zeroSeen = 1;
-        for (i = 0; i < outArr.length; i++) {
+        for (int i = 0; i < outArr.length; i++) {
             if (V[i] == 0) {
                 // i is the index of the row of the original string
                 rowId[0] = i + 1;
@@ -170,6 +174,7 @@ public class BWT {
         }
         outArr[0] = S[S.length - 1];
 
+        System.out.println("8");
         return outArr;
     }
 
@@ -177,13 +182,24 @@ public class BWT {
      *  Reverses the BWT transformation. Assumes the int in inArr is the row id of the original string
      */
     public static int[] reverseTransform(int[] inArr, int rowId) {
-        System.out.println(rowId);
+        // Add -1 to a new last index of the array
+        int[] arr = new int[inArr.length + 1];
+        for (int i = 0; i < rowId; i++) {
+            arr[i] = inArr[i];
+        }
+        arr[rowId] = -1;
+        for (int i = rowId + 1; i < arr.length; i++) {
+            arr[i] = inArr[i - 1];
+        }
+        inArr = arr;
+
         // P[i] is the number of instances of character L[i] in L[0, 1, ..., i-1]
         int[] P = new int[inArr.length];
 
         // count[ch] is the total number of instances in L, of characters preceding 
         // character ch in the alphabet.
         int[] count = new int[257];
+        
 
         // First pass - 
         //  count[ch] is the amount of times ch appears in L.
@@ -192,19 +208,16 @@ public class BWT {
             P[i] = count[inArr[i] + 1];
             count[inArr[i] + 1]++;
         }
-        count[0]++;
-        System.out.println(Arrays.toString(P));
 
         int sum = 0;
         for (int i = 0; i < count.length; i++) {
             sum += count[i];
             count[i] = sum - count[i];
         }
-        System.out.println(Arrays.toString(count));
 
-        int[] outArr = new int[inArr.length];
+        int[] outArr = new int[inArr.length - 1];
         int i = rowId;
-        i = P[i] + count[inArr[i] + 1];
+        i = P[i];
         for (int j = outArr.length - 1; j >= 0; j--) {
             outArr[j] = inArr[i];
             i = P[i] + count[inArr[i] + 1];

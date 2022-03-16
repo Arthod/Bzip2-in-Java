@@ -21,14 +21,8 @@ class EncodeDecode {
         // Compression
         int[] tempArr = inArr.clone();
         int[] rowId = new int[1];
-        int[] rowId2 = new int[1];
-        int[] tempArr2 = BWT.naiveTransform(tempArr, rowId2);
+
         tempArr = BWT.transform(tempArr, rowId);
-
-        System.out.println(Arrays.toString(tempArr2));
-        System.out.println(Arrays.toString(tempArr));
-
-        System.out.println("rowId: " + rowId[0]);
         //tempArr = MoveToFront.encode(tempArr);
         //tempArr = Huffman.encode(tempArr);
 
