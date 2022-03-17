@@ -36,7 +36,15 @@ class EncodeDecode {
         tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
-        writeToFile(outFileName, tempArr);
+        FileOutputStream outFileStream = new FileOutputStream(outFileName);
+
+        // Write int array to file
+        for (int i = 0; i < tempArr.length - 1; i++) {
+            outFileStream.write(tempArr[i]);
+        }
+
+        // Close file
+        outFileStream.close();
 
         // Check that compression/decompression returns same string
         if (tempArr.length != inArr.length) {

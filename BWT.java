@@ -1,4 +1,4 @@
-import java.net.http.WebSocket;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+
+import org.omg.CORBA.PERSIST_STORE;
 
 public class BWT {
     private static final int unusedByte = -1;  // The character that does not appear in our string
@@ -156,6 +158,23 @@ public class BWT {
                 }
             }
         }
+
+        // Test V array is sorted
+        for (int i = 0; i < V.length - 2; i++) {
+            int c = V[i];
+            int l = V[i + 1];
+            while (sArr[c] == sArr[l]) {
+                c++;
+                l++;
+            }
+            if (sArr[c] > sArr[l]) {
+                for (int j = -1; j < 50; j++) {
+                    System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
+                }
+                System.out.println();
+                System.out.println("Fejl: " + c);
+            }
+        }
         
         System.out.println("7");
         // Now our V has the correctly sorted indicies of the square
@@ -256,7 +275,7 @@ public class BWT {
         if (startIndex >= endIndex) {
             return;
         }
-        int q = randomizedPartition(indexArray, comparedArray, startIndex, endIndex);
+        int q = partition(indexArray, comparedArray, startIndex, endIndex);
         quicksortIndexArray(indexArray, comparedArray, startIndex, q - 1);
         quicksortIndexArray(indexArray, comparedArray, q + 1, endIndex);
     }
