@@ -23,10 +23,10 @@ public class BWTLongs {
             }
             W[i] = bytesToLong(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3], sArr[i + 4], sArr[i + 5], 255);
         }
-        W[S.length - 5] = bytesToLong(sArr[S.length - 5], sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0);
-        W[S.length - 4] = bytesToLong(sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0);
-        W[S.length - 3] = bytesToLong(sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 0);
-        W[S.length - 2] = bytesToLong(sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 0, 0);
+        W[S.length - 5] = bytesToLong(sArr[S.length - 5], sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 4);
+        W[S.length - 4] = bytesToLong(sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 3);
+        W[S.length - 3] = bytesToLong(sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 2);
+        W[S.length - 2] = bytesToLong(sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 0, 1);
         W[S.length - 1] = bytesToLong(sArr[S.length - 1], 0, 0, 0, 0, 0, 0);
 
         // Array V  Q4
@@ -62,6 +62,7 @@ public class BWTLongs {
                 for (int j = 0; j < 10; j++) {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
+                return null;
             }
         }
 
@@ -89,17 +90,17 @@ public class BWTLongs {
             int l = V[i + 1];
             if (sArr[c] > sArr[l]) {
                 System.out.println("Fail");
+                return null;
             }
             if (sArr[c] == sArr[l]) {
                 if (sArr[c + 1] > sArr[l + 1]) {
                     System.out.println("Fail");
+                    return null;
                 }
             }
         }
-        System.out.println(Arrays.toString(V));
 
         // Q5
-    
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
         for (int ch1 = -1; ch1 < 256 && amountComparedEqualTotal < S.length; ch1++) {
@@ -132,7 +133,6 @@ public class BWTLongs {
             }*/
 
         }
-        System.out.println(Arrays.toString(V));
 
         // Test V array is sorted
         for (int i = 0; i < V.length - 2; i++) {
@@ -144,10 +144,12 @@ public class BWTLongs {
             }
             if (sArr[c] > sArr[l]) {
                 System.out.println("Fejl: " + i + ", c: " + c);
+                
                 for (int j = -1; j < 50; j++) {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
                 System.out.println();
+                return null;
             }
         }
         
@@ -211,11 +213,11 @@ public class BWTLongs {
         int pivot = indexArray[endIndex];
         int i = startIndex - 1;
 
-        for (int j = startIndex; j <= endIndex - 1; j++) {
+        for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);
-            for (int k = 0; k < comparedArray.length - indexLimit; k += 6) {
+            for (int k = 0; k < comparedArray.length - indexLimit; k += Math.min(6, comparedArray.length - indexLimit - 1)) {
 
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {

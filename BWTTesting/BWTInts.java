@@ -211,7 +211,7 @@ public class BWTInts {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);
-            for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
+            for (int k = 0; k < comparedArray.length - indexLimit; k += 1) {
 
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {

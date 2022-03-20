@@ -5,12 +5,12 @@ public class test {
     
     public static void main(String[] args) {
         
-        for (int i = 0; i < 10000; i++) {
-            int[] inArr = generateRandomString(10000);
-            //int[] inArr = new int[] {210, 140, 210, 210, 105, 70, 0, 0, 0, 0};
-            //System.out.println(Arrays.toString(inArr));
+        for (int i = 0; i < 1000; i++) {
+            int[] inArr = generateRandomString(100000);
+            //int[] inArr = new int[] {105, 140, 35, 70, 70, 70, 70, 70, 70, 70};
 
-            BWTBytes.transform(inArr, new int[] {0});
+            System.out.println(i + "/" + 1000);
+            BWTInts.transform(inArr, new int[] {0});
         }
     }
     /*
@@ -58,6 +58,20 @@ public class test {
 
         for (int i = 0; i < arr.length; i++) {
             arr[i] = random.nextInt(8) * 35;
+        }
+
+        for (int i = 100; i < 200; i += 1) {
+            arr[i] = 0;
+        }
+        for (int i = 200; i < 300; i += 2) {
+            arr[i] = 0;
+        }
+        for (int i = 500; i < 800; i += 2) {
+            arr[i] = 15;
+            arr[i + 1] = 16;
+        }
+        for (int i = 1100; i < 1400; i += 1) {
+            arr[i] = 200;
         }
 
         return arr;
