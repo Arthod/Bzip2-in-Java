@@ -106,7 +106,7 @@ public class BWTBytes {
                 // If there's atleast two that are compared equal we need to sort them.
                 if (amountComparedEqualTotal - first >= 2) {
                     //System.out.println(first + " -> " + (amountComparedEqualTotal - first));
-                    quicksortIndexArray(V, S, first, amountComparedEqualTotal - 1);
+                    quicksortIndexArray(V, sArr, first, amountComparedEqualTotal - 1);
                 }
             }
             /*
@@ -126,11 +126,11 @@ public class BWTBytes {
                 l++;
             }
             if (sArr[c] > sArr[l]) {
+                System.out.println("Fejl: " + c);
                 for (int j = -1; j < 50; j++) {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
                 System.out.println();
-                System.out.println("Fejl: " + c);
             }
         }
         
@@ -151,10 +151,6 @@ public class BWTBytes {
         outArr[0] = S[S.length - 1];
 
         return outArr;
-    }
-    
-    private static long bytesToLong(int a, int b, int c, int d, int e, int f, int g) {
-        return (((long) 0 << 56) + ((long) a << 48) + ((long)b << 40) + ((long)c << 32) + ((long)d << 24) + ((long)e << 16) + ((long)f << 8) + ((long)g << 0));
     }
 
     private static void quicksortIndexArray(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
@@ -194,7 +190,7 @@ public class BWTBytes {
         int pivot = indexArray[endIndex];
         int i = startIndex - 1;
 
-        for (int j = startIndex; j <= endIndex - 1; j++) {
+        for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);
@@ -226,4 +222,5 @@ public class BWTBytes {
         arr[index1] = arr[index2];
         arr[index2] = temp;
     }
+
 }

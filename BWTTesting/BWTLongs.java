@@ -28,7 +28,7 @@ public class BWTLongs {
         W[S.length - 3] = bytesToLong(sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 0);
         W[S.length - 2] = bytesToLong(sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 0, 0);
         W[S.length - 1] = bytesToLong(sArr[S.length - 1], 0, 0, 0, 0, 0, 0);
-        
+
         // Array V  Q4
         // Sort by first two characters using radix sort using counting sort
         int[] V_temp = new int[W.length];
@@ -96,6 +96,7 @@ public class BWTLongs {
                 }
             }
         }
+        System.out.println(Arrays.toString(V));
 
         // Q5
     
@@ -123,13 +124,15 @@ public class BWTLongs {
                     quicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
             }
+
             /*
-            for (int i = first; i < amountComparedEqualTotal; i++) {
-                if (sArr[V[i]] != ch1) {
-                    System.out.println("qwerty");
-                }
+            if (amountComparedEqualTotal < 2e40) {
+                for (int i = first; i < amountComparedEqualTotal; i++) {
+                    W[i] = (((long) 0 << 56) + ((long) ch1 << 48) + (i << 8));
             }*/
+
         }
+        System.out.println(Arrays.toString(V));
 
         // Test V array is sorted
         for (int i = 0; i < V.length - 2; i++) {
@@ -140,11 +143,11 @@ public class BWTLongs {
                 l++;
             }
             if (sArr[c] > sArr[l]) {
+                System.out.println("Fejl: " + i + ", c: " + c);
                 for (int j = -1; j < 50; j++) {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
                 System.out.println();
-                System.out.println("Fejl: " + c);
             }
         }
         

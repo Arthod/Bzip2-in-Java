@@ -93,6 +93,8 @@ public class BWTInts {
             }
         }
 
+        System.out.println(Arrays.toString(V));
+
         // Q5
     
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
@@ -126,6 +128,7 @@ public class BWTInts {
                 }
             }*/
         }
+        System.out.println(Arrays.toString(V));
 
         // Test V array is sorted
         for (int i = 0; i < V.length - 2; i++) {
@@ -136,11 +139,11 @@ public class BWTInts {
                 l++;
             }
             if (sArr[c] > sArr[l]) {
+                System.out.println("Fejl: " + c);
                 for (int j = -1; j < 50; j++) {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
                 System.out.println();
-                System.out.println("Fejl: " + c);
             }
         }
         
