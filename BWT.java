@@ -7,8 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import org.omg.CORBA.PERSIST_STORE;
-
 public class BWT {
     private static final int unusedByte = -1;  // The character that does not appear in our string
     private static Random random = new Random();
@@ -68,7 +66,11 @@ public class BWT {
         // Create array W of N words. Pack 4 bytes into 1 word (integer)    Q2
         int[] W = new int[S.length];
         for (int i = 0; i < W.length; i++) {
-            W[i] = bytesToWords(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3]);
+            W[i] = bytesToWord(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3]);
+            if (sArr[i + 3] == -1) {
+                System.out.println(bytesToWord(sArr[i], 0, 0, 0));
+                System.out.println(W[i]);
+            }
         }
         
         System.out.println("3");
@@ -158,6 +160,7 @@ public class BWT {
                 }
             }
         }
+        System.out.println("6.5");
 
         // Test V array is sorted
         for (int i = 0; i < V.length - 2; i++) {
@@ -245,7 +248,7 @@ public class BWT {
         return outArr;
     }
 
-    private static int bytesToWords(int a, int b, int c, int d) {
+    private static int bytesToWord(int a, int b, int c, int d) {
         // Big endian   | instead of +
         return ((a << 24) + (b << 16) + (c << 8) + (d << 0));
     }

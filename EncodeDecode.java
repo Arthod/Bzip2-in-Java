@@ -23,28 +23,20 @@ class EncodeDecode {
         int[] rowId = new int[1];
 
         tempArr = BWT.transform(tempArr, rowId);
-        //tempArr = MoveToFront.encode(tempArr);
-        //tempArr = Huffman.encode(tempArr);
+        tempArr = MoveToFront.encode(tempArr);
+        tempArr = Huffman.encode(tempArr);
 
         // Write encoded to file, and read again from it (this step is required for Huffman encoding to work (for some reason...))
         writeToFile(encodedFileName, tempArr);
         tempArr = readFile(encodedFileName);
 
         // Decompression
-        //tempArr = Huffman.decode(tempArr);
-        //tempArr = MoveToFront.decode(tempArr);
+        tempArr = Huffman.decode(tempArr);
+        tempArr = MoveToFront.decode(tempArr);
         tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
-        FileOutputStream outFileStream = new FileOutputStream(outFileName);
-
-        // Write int array to file
-        for (int i = 0; i < tempArr.length - 1; i++) {
-            outFileStream.write(tempArr[i]);
-        }
-
-        // Close file
-        outFileStream.close();
+        writeToFile(outFileName, tempArr);
 
         // Check that compression/decompression returns same string
         if (tempArr.length != inArr.length) {
