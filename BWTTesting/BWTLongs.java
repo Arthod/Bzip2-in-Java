@@ -216,8 +216,8 @@ public class BWTLongs {
         for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
-            int indexLimit = Math.max(indexArray[j], pivot);
-            for (int k = 0; k < comparedArray.length - indexLimit; k += Math.min(6, comparedArray.length - indexLimit - 1)) {
+            int indexLimit = Math.max(indexArray[j], pivot);    // TODO This probably doesn't work!!
+            for (int k = 0; k < comparedArray.length - indexLimit; k += Math.min(6, comparedArray.length - indexLimit - 1 - k)) {
 
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {

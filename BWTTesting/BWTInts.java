@@ -20,6 +20,7 @@ public class BWTInts {
         for (int i = 0; i < S.length - 1; i++) {
             if (sArr[i] == unusedByte || sArr[i + 1] == unusedByte) {
                 System.out.println("error");
+                return null;
             }
             W[i] = bytesToInt(sArr[i], sArr[i + 1], 255);
         }
@@ -58,6 +59,7 @@ public class BWTInts {
                 for (int j = 0; j < 10; j++) {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
+                return null;
             }
         }
 
@@ -85,15 +87,15 @@ public class BWTInts {
             int l = V[i + 1];
             if (sArr[c] > sArr[l]) {
                 System.out.println("Fail");
+                return null;
             }
             if (sArr[c] == sArr[l]) {
                 if (sArr[c + 1] > sArr[l + 1]) {
                     System.out.println("Fail");
+                    return null;
                 }
             }
         }
-
-        System.out.println(Arrays.toString(V));
 
         // Q5
     
@@ -128,7 +130,6 @@ public class BWTInts {
                 }
             }*/
         }
-        System.out.println(Arrays.toString(V));
 
         // Test V array is sorted
         for (int i = 0; i < V.length - 2; i++) {
@@ -144,6 +145,7 @@ public class BWTInts {
                     System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
                 }
                 System.out.println();
+                return null;
             }
         }
         
@@ -207,15 +209,14 @@ public class BWTInts {
         int pivot = indexArray[endIndex];
         int i = startIndex - 1;
 
-        for (int j = startIndex; j <= endIndex - 1; j++) {
+        for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);
-            for (int k = 0; k < comparedArray.length - indexLimit; k += 1) {
-
+            for (int k = 0; k < comparedArray.length - indexLimit; k += Math.min(2, comparedArray.length - indexLimit - 1 - k)) {
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
-                // If they are not equal, check comparison, and swap if greater than pivot
+                    // If they are not equal, check comparison, and swap if greater than pivot
                     if (comparedArray[indexArray[j] + k] <= comparedArray[pivot + k]) {
                         i++;
                         swap(indexArray, i, j);

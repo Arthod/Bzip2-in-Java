@@ -4,17 +4,6 @@ import java.util.Random;
 public class test {
     
     public static void main(String[] args) {
-        
-        for (int i = 0; i < 1000; i++) {
-            int[] inArr = generateRandomString(100000);
-            //int[] inArr = new int[] {105, 140, 35, 70, 70, 70, 70, 70, 70, 70};
-
-            System.out.println(i + "/" + 1000);
-            BWTInts.transform(inArr, new int[] {0});
-        }
-    }
-    /*
-    public static void main(String[] args) {
         int stringLength = (int) 1_000_000;
         int[] inArr;
 
@@ -50,7 +39,7 @@ public class test {
         }
         System.out.println("BWTBytes avg. time: " + (sumTime / 10) / 10e8 + "s");
         sumTime = 0;
-    }*/
+    }
 
     private static int[] generateRandomString(int length) {
         int[] arr = new int[length];
