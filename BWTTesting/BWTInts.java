@@ -17,13 +17,14 @@ public class BWTInts {
 
         // Create array W of N words. Pack 2 bytes into 1 integer    Q2
         int[] W = new int[S.length];
-        for (int i = 0; i < S.length - 1; i++) {
+        for (int i = 0; i < S.length - 2; i++) {
             if (sArr[i] == unusedByte || sArr[i + 1] == unusedByte) {
                 System.out.println("error");
                 return null;
             }
             W[i] = bytesToInt(sArr[i], sArr[i + 1], 255);
         }
+        W[S.length - 2] = bytesToInt(sArr[S.length - 2], sArr[S.length - 1], 1);
         W[S.length - 1] = bytesToInt(sArr[S.length - 1], 0, 0);
         
         // Array V  Q4
@@ -213,7 +214,7 @@ public class BWTInts {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);
-            for (int k = 0; k < comparedArray.length - indexLimit; k += Math.min(2, comparedArray.length - indexLimit - 1 - k)) {
+            for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
                     // If they are not equal, check comparison, and swap if greater than pivot

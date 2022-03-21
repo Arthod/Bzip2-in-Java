@@ -17,12 +17,13 @@ public class BWTLongs {
 
         // Create array W of N words. Pack 2 bytes into 1 long    Q2
         long[] W = new long[S.length];
-        for (int i = 0; i < S.length - 5; i++) {
+        for (int i = 0; i < S.length - 6; i++) {
             if (sArr[i] == unusedByte || sArr[i + 1] == unusedByte) {
                 System.out.println("error");
             }
             W[i] = bytesToLong(sArr[i], sArr[i + 1], sArr[i + 2], sArr[i + 3], sArr[i + 4], sArr[i + 5], 255);
         }
+        W[S.length - 6] = bytesToLong(sArr[S.length - 6], sArr[S.length - 5], sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 5);
         W[S.length - 5] = bytesToLong(sArr[S.length - 5], sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 4);
         W[S.length - 4] = bytesToLong(sArr[S.length - 4], sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 3);
         W[S.length - 3] = bytesToLong(sArr[S.length - 3], sArr[S.length - 2], sArr[S.length - 1], 0, 0, 0, 2);
@@ -217,7 +218,7 @@ public class BWTLongs {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
             int indexLimit = Math.max(indexArray[j], pivot);    // TODO This probably doesn't work!!
-            for (int k = 0; k < comparedArray.length - indexLimit; k += Math.min(6, comparedArray.length - indexLimit - 1 - k)) {
+            for (int k = 0; k < comparedArray.length - indexLimit; k += 6) {
 
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
