@@ -22,20 +22,24 @@ class EncodeDecode {
         int[] tempArr = inArr.clone();
         int[] rowId = new int[1];
 
+        System.out.println("BWT transforming");
         tempArr = BWT.transform(tempArr, rowId);
-        tempArr = MoveToFront.encode(tempArr);
-        tempArr = Huffman.encode(tempArr);
+        //tempArr = MoveToFront.encode(tempArr);
+        //tempArr = Huffman.encode(tempArr);
 
         // Write encoded to file, and read again from it (this step is required for Huffman encoding to work (for some reason...))
+        System.out.println("Writing encoded to file");
         writeToFile(encodedFileName, tempArr);
         tempArr = readFile(encodedFileName);
 
         // Decompression
-        tempArr = Huffman.decode(tempArr);
-        tempArr = MoveToFront.decode(tempArr);
+        //tempArr = Huffman.decode(tempArr);
+        //tempArr = MoveToFront.decode(tempArr);
+        System.out.println("BWT reverse transforming");
         tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
+        System.out.println("Writing decoded to file");
         writeToFile(outFileName, tempArr);
 
         // Check that compression/decompression returns same string

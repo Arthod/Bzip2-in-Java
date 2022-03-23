@@ -3,19 +3,20 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class test {
-    private static int stringLength = (int) 20_000;
+    private static int stringLength = (int) 2_000_000;
     private static int testAmountPer = 3;
-    /*
+    
+    
     public static void main(String[] args) {
 
-        for (int i = 0; i < 100000; i++) {
-            int[] inArr = generateRandomString(100);
+        for (int i = 0; i < 10000; i++) {
+            int[] inArr = generateRandomString(1000);
 
             System.out.println(i);
             BWTInts.transform(inArr, new int[] {0});
-            BWTLongs.transform(inArr, new int[] {0});
         }
-    }*/
+    }
+    /*
     public static void main(String[] args) throws Exception {
         int[] inArr;
 
@@ -27,29 +28,11 @@ public class test {
             inArr = getString();
 
             startTime = System.nanoTime();
-            BWTLongs.transform(inArr, new int[] {0});
-            sumTime += System.nanoTime() - startTime;
-        }
-        System.out.println("BWTLongs kingjamesbible avg. time: " + (sumTime / testAmountPer) / 10e8 + "s");
-        sumTime = 0;
-        for (int i = 0; i < testAmountPer; i++) {
-            inArr = generateRandomString(stringLength);
-
-            startTime = System.nanoTime();
-            BWTLongs.transform(inArr, new int[] {0});
-            sumTime += System.nanoTime() - startTime;
-        }
-        System.out.println("BWTLongs random avg. time: " + (sumTime / testAmountPer) / 10e8 + "s");
-
-        sumTime = 0;
-        for (int i = 0; i < testAmountPer; i++) {
-            inArr = getString();
-
-            startTime = System.nanoTime();
             BWTInts.transform(inArr, new int[] {0});
             sumTime += System.nanoTime() - startTime;
         }
         System.out.println("BWTInts kingjamesbible avg. time: " + (sumTime / testAmountPer) / 10e8 + "s");
+        
         sumTime = 0;
         for (int i = 0; i < testAmountPer; i++) {
             inArr = generateRandomString(stringLength);
@@ -59,27 +42,7 @@ public class test {
             sumTime += System.nanoTime() - startTime;
         }
         System.out.println("BWTInts random avg. time: " + (sumTime / testAmountPer) / 10e8 + "s");
-
-        sumTime = 0;
-        for (int i = 0; i < testAmountPer; i++) {
-            inArr = getString();
-
-            startTime = System.nanoTime();
-            BWTBytes.transform(inArr, new int[] {0});
-            sumTime += System.nanoTime() - startTime;
-        }
-        System.out.println("BWTBytes kingjamesbible avg. time: " + (sumTime / testAmountPer) / 10e8 + "s");
-        sumTime = 0;
-        for (int i = 0; i < testAmountPer; i++) {
-            inArr = generateRandomString(stringLength);
-
-            startTime = System.nanoTime();
-            BWTBytes.transform(inArr, new int[] {0});
-            sumTime += System.nanoTime() - startTime;
-        }
-        System.out.println("BWTBytes random avg. time: " + (sumTime / testAmountPer) / 10e8 + "s");
-        sumTime = 0;
-    }
+    }*/
 
     private static int[] getString() throws Exception {
         return readFile("KingJamesBible.txt");//generateRandomString(stringLength);
@@ -110,8 +73,7 @@ public class test {
         Random random = new Random();
 
         for (int i = 0; i < arr.length; i++) {
-            //arr[i] = random.nextInt(8) * 35;
-            arr[i] = 100;
+            arr[i] = random.nextInt(8) * 35;
         }
 
         /*

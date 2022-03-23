@@ -121,7 +121,7 @@ public class BWTInts {
                 // If there's atleast two that are compared equal we need to sort them.
                 if (amountComparedEqualTotal - first >= 2) {
                     //System.out.println(first + " -> " + (amountComparedEqualTotal - first));
-                    quicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
+                    randomizedQuicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
             }
             /*
@@ -173,18 +173,6 @@ public class BWTInts {
         return ((0 << 24) + (a << 16) + (b << 8) + (c << 0));
     }
 
-    private static void quicksortIndexArray(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
-        // In-place implementation of quicksort that sorts an index 
-        // array based on the comparable values of a comparable array
-        if (startIndex >= endIndex) {
-            return;
-        }
-        //System.out.println("going in " + startIndex + " -> " + endIndex);
-        int q = partition(indexArray, comparedArray, startIndex, endIndex);
-        quicksortIndexArray(indexArray, comparedArray, startIndex, q - 1);
-        quicksortIndexArray(indexArray, comparedArray, q + 1, endIndex);
-    }
-
     private static void randomizedQuicksortIndexArray(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
         // In-place implementation of quicksort that sorts an index 
         // array based on the comparable values of a comparable array
@@ -213,7 +201,19 @@ public class BWTInts {
         for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
-            int indexLimit = Math.max(indexArray[j], pivot);
+            int k = 0;
+            while (true) {
+                if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
+                    // If they are not equal, check comparison, and swap if greater than pivot
+                    if (comparedArray[indexArray[j] + k] <= comparedArray[pivot + k]) {
+                        i++;
+                        swap(indexArray, i, j);
+                    }
+                    break;
+                }
+                k += 2;
+            }
+            /*
             for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
@@ -224,7 +224,7 @@ public class BWTInts {
                     }
                     break;
                 }
-            }
+            }*/
             /*
             if (comparedArray[indexArray[j]] > comparedArray[pivot]) {
                 i++;
