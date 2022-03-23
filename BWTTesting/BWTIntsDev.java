@@ -1,15 +1,15 @@
 import java.util.Arrays;
 import java.util.Random;
 
-public class BWTInts {
+public class BWTIntsDev {
     private final static int unusedByte = -1;
     private final static Random random = new Random();
     
     public static int[] transform(int[] S, int[] rowId) {
         // Create new array with k=2 EOF characters at the end
-        int[] sArr = new int[S.length + 2];
+        short[] sArr = new short[S.length + 2];
         for (int i = 0; i < S.length; i++) {
-            sArr[i] = S[i];
+            sArr[i] = (short) S[i];
         }
         for (int i = 0; i < 2; i++) {
             sArr[S.length + i] = unusedByte;
