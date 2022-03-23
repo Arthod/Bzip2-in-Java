@@ -33,22 +33,25 @@ public class BWTInts {
         int[] V = new int[W.length];
         int k;
         int[] count = new int[257];
+        int[] countCurrent;
         
         // Radix sort
-        // Count the characters
-        for (int i = 0; i < S.length; i++) {
-            count[sArr[i + 1] + 1]++;
+        // Count the characters (skip the first character)
+        for (int i = 1; i < S.length + 1; i++) {
+            count[sArr[i] + 1]++;
         }
 
+        countCurrent = new int[257];
+        countCurrent[0] = 1;
         for (int i = 1; i < count.length; i++) {
-            count[i] += count[i - 1];
-        }        
+            countCurrent[i] = count[i] + countCurrent[i - 1];
+        }
         
         // Go in reverse, and write the index
         for (int i = S.length - 1; i >= 0; i--) {
             k = sArr[i + 1] + 1;
-            V_temp[count[k] - 1] = i;
-            count[k]--;
+            V_temp[countCurrent[k] - 1] = i;
+            countCurrent[k]--;
         }
         
         // Test V_temp array is sorted by 2nd char
@@ -65,12 +68,8 @@ public class BWTInts {
         }
 
         /// Sort by first character
-        // Count characters
-        count = new int[count.length];
-        for (int i = 0; i < S.length; i++) {
-            count[sArr[i] + 1]++;
-        }
-
+        count[0]--;
+        count[sArr[0] + 1]++;
         for (int i = 1; i < count.length; i++) {
             count[i] += count[i - 1];
         }
