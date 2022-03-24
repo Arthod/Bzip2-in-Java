@@ -7,9 +7,9 @@ public class BWT {
     
     public static int[] transform(int[] S, int[] rowId) {
         // Create new array with k=2 EOF characters at the end
-        int[] sArr = new int[S.length + 2];
+        short[] sArr = new short[S.length + 2];
         for (int i = 0; i < S.length; i++) {
-            sArr[i] = S[i];
+            sArr[i] = (short) S[i];
         }
         for (int i = 0; i < 2; i++) {
             sArr[S.length + i] = unusedByte;
@@ -33,44 +33,30 @@ public class BWT {
         int[] V = new int[W.length];
         int k;
         int[] count = new int[257];
+        int[] countCurrent;
         
         // Radix sort
-        // Count the characters
-        for (int i = 0; i < S.length; i++) {
-            count[sArr[i + 1] + 1]++;
+        // Count the characters (skip the first character)
+        for (int i = 1; i < S.length + 1; i++) {
+            count[sArr[i] + 1]++;
         }
 
+        countCurrent = new int[257];
+        countCurrent[0] = 1;
         for (int i = 1; i < count.length; i++) {
-            count[i] += count[i - 1];
-        }        
+            countCurrent[i] = count[i] + countCurrent[i - 1];
+        }
         
         // Go in reverse, and write the index
         for (int i = S.length - 1; i >= 0; i--) {
             k = sArr[i + 1] + 1;
-            V_temp[count[k] - 1] = i;
-            count[k]--;
-        }
-        
-        // Test V_temp array is sorted by 2nd char
-        for (int i = 0; i < V.length - 2; i++) {
-            int c = V_temp[i];
-            int l = V_temp[i + 1];
-            if (sArr[c + 1] > sArr[l + 1]) {
-                System.out.println("Fejl not sorted by 2nd char: " + c);
-                for (int j = 0; j < 10; j++) {
-                    System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
-                }
-                return null;
-            }
+            V_temp[countCurrent[k] - 1] = i;
+            countCurrent[k]--;
         }
 
         /// Sort by first character
-        // Count characters
-        count = new int[count.length];
-        for (int i = 0; i < S.length; i++) {
-            count[sArr[i] + 1]++;
-        }
-
+        count[0]--;
+        count[sArr[0] + 1]++;
         for (int i = 1; i < count.length; i++) {
             count[i] += count[i - 1];
         }
@@ -82,27 +68,11 @@ public class BWT {
             count[k]--;
         }
 
-        // Test V array is sorted by first two chars
-        for (int i = 0; i < V.length - 2; i++) {
-            int c = V[i];
-            int l = V[i + 1];
-            if (sArr[c] > sArr[l]) {
-                System.out.println("Fail");
-                return null;
-            }
-            if (sArr[c] == sArr[l]) {
-                if (sArr[c + 1] > sArr[l + 1]) {
-                    System.out.println("Fail");
-                    return null;
-                }
-            }
-        }
-
         // Q5
     
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
-        for (int ch1 = -1; ch1 < 256 && amountComparedEqualTotal < S.length; ch1++) {
+        for (int ch1 = 0; ch1 < 256; ch1++) {
             // Q6
             for (int ch2 = -1; ch2 < 256 && amountComparedEqualTotal < S.length; ch2++) {
                 // We know that V is sorted by the first two characters
@@ -120,33 +90,8 @@ public class BWT {
 
                 // If there's atleast two that are compared equal we need to sort them.
                 if (amountComparedEqualTotal - first >= 2) {
-                    //System.out.println(first + " -> " + (amountComparedEqualTotal - first));
                     randomizedQuicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
-            }
-            /*
-            for (int i = first; i < amountComparedEqualTotal; i++) {
-                if (sArr[V[i]] != ch1) {
-                    System.out.println("qwerty");
-                }
-            }*/
-        }
-
-        // Test V array is sorted
-        for (int i = 0; i < V.length - 2; i++) {
-            int c = V[i];
-            int l = V[i + 1];
-            while (sArr[c] == sArr[l]) {
-                c++;
-                l++;
-            }
-            if (sArr[c] > sArr[l]) {
-                System.out.println("Fejl: " + c);
-                for (int j = -1; j < 50; j++) {
-                    System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
-                }
-                System.out.println();
-                return null;
             }
         }
         
@@ -219,19 +164,7 @@ public class BWT {
     }
 
     private static int bytesToInt(int a, int b, int c) {
-        return ((0 << 24) + (a << 16) + (b << 8) + (c << 0));
-    }
-
-    private static void quicksortIndexArray(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
-        // In-place implementation of quicksort that sorts an index 
-        // array based on the comparable values of a comparable array
-        if (startIndex >= endIndex) {
-            return;
-        }
-        //System.out.println("going in " + startIndex + " -> " + endIndex);
-        int q = partition(indexArray, comparedArray, startIndex, endIndex);
-        quicksortIndexArray(indexArray, comparedArray, startIndex, q - 1);
-        quicksortIndexArray(indexArray, comparedArray, q + 1, endIndex);
+        return ((0 << 24) | (a << 16) | (b << 8) | (c << 0));
     }
 
     private static void randomizedQuicksortIndexArray(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
@@ -262,7 +195,19 @@ public class BWT {
         for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
-            int indexLimit = Math.max(indexArray[j], pivot);
+            int k = 0;
+            while (true) {
+                if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
+                    // If they are not equal, check comparison, and swap if greater than pivot
+                    if (comparedArray[indexArray[j] + k] <= comparedArray[pivot + k]) {
+                        i++;
+                        swap(indexArray, i, j);
+                    }
+                    break;
+                }
+                k += 2;
+            }
+            /*
             for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
                 // Check if they are equal
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
@@ -273,7 +218,7 @@ public class BWT {
                     }
                     break;
                 }
-            }
+            }*/
             /*
             if (comparedArray[indexArray[j]] > comparedArray[pivot]) {
                 i++;
