@@ -24,8 +24,10 @@ class EncodeDecode {
 
         System.out.println("BWT transforming");
         tempArr = BWT.transform(tempArr, rowId);
-        //tempArr = MoveToFront.encode(tempArr);
-        //tempArr = Huffman.encode(tempArr);
+        System.out.println("MTF encoding");
+        tempArr = MoveToFront.encode(tempArr);
+        System.out.println("Huffman encoding");
+        tempArr = Huffman.encode(tempArr);
 
         // Write encoded to file, and read again from it (this step is required for Huffman encoding to work (for some reason...))
         System.out.println("Writing encoded to file");
@@ -33,8 +35,10 @@ class EncodeDecode {
         tempArr = readFile(encodedFileName);
 
         // Decompression
-        //tempArr = Huffman.decode(tempArr);
-        //tempArr = MoveToFront.decode(tempArr);
+        System.out.println("Huffman decoding");
+        tempArr = Huffman.decode(tempArr);
+        System.out.println("MTF decoding");
+        tempArr = MoveToFront.decode(tempArr);
         System.out.println("BWT reverse transforming");
         tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         

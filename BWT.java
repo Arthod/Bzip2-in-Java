@@ -1,6 +1,9 @@
 import java.util.Arrays;
 import java.util.Random;
 
+// TODO see if sArr can be removed.. I assume it can
+// TODO convert input from int to short, and all other places
+
 public class BWT {
     private final static int unusedByte = -1;
     private final static Random random = new Random();
@@ -69,7 +72,6 @@ public class BWT {
         }
 
         // Q5
-    
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
         for (int ch1 = 0; ch1 < 256; ch1++) {
@@ -235,4 +237,5 @@ public class BWT {
         arr[index1] = arr[index2];
         arr[index2] = temp;
     }
+
 }
