@@ -15,8 +15,7 @@ import java.util.Random;
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {
 
-        /*
-        int[] S = {1,1,2,2};
+        int[] S = {1,1,1,1,1,1,1,1,1,1,3};
         int[] rowId = {0};
         
         System.out.println("arrIn: " + Arrays.toString(S) + ", runs: " + countRuns(S) + ", sum: " + sumArr(S));
@@ -25,10 +24,9 @@ class EncodeDecode {
             outArr = BWT2.transform(outArr, rowId);
             System.out.println("arrOut: " + Arrays.toString(outArr) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr));
         }
-        */
+        
 
-        String inFileName = args[0];
-        encodeDecodeFile(inFileName);
+        //encodeDecodeFile(args[0]);
 
 	}
 
@@ -45,7 +43,7 @@ class EncodeDecode {
         int[] rowId = new int[1];
 
         System.out.println("BWT transforming");
-        tempArr = BWT.transform(tempArr, rowId);
+        tempArr = BWT2.transform(tempArr, rowId);
         System.out.println("MTF encoding");
         tempArr = MoveToFront.encode(tempArr);
         System.out.println("Huffman encoding");
@@ -67,7 +65,9 @@ class EncodeDecode {
         // Write out to file
         System.out.println("Writing decoded to file");
         writeToFile(outFileName, tempArr);
-        assert isEqual(tempArr, inArr);
+
+        
+        isEqual(tempArr, inArr);
     }
     
     private static int[] readFile(String inFileName) throws Exception {

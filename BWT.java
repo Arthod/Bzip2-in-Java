@@ -222,14 +222,14 @@ public class BWT {
         return partition(indexArray, comparedArray, startIndex, endIndex);
     }
 
-    private static int partition(int[] indexArray, int[] comparedArray, int startIndex, int endIndex, int kMin) {
+    private static int partition(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
         int pivot = indexArray[endIndex];
         int i = startIndex - 1;
 
         for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
-            int k = kMin;
+            int k = 0;
             while (true) {
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
                     // If they are not equal, check comparison, and swap if greater than pivot
@@ -238,14 +238,8 @@ public class BWT {
                         swap(indexArray, i, j);
                     }
                     break;
-                } else {
-                    kMin = Math.min(kMin, k);
                 }
                 k += 2;
-            }
-
-            if (kMin > 0) {
-                System.out.println(kMin);
             }
             /*
             for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
