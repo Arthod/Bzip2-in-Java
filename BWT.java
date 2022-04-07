@@ -71,6 +71,21 @@ public class BWT {
             count[k]--;
         }
 
+        
+        // Test V array is sorted by first two chars
+        for (int i = 0; i < V.length - 2; i++) {
+            int c = V[i];
+            int l = V[i + 1];
+            if (sArr[c] > sArr[l]) {
+                System.out.println("Fail");
+            }
+            if (sArr[c] == sArr[l]) {
+                if (sArr[c + 1] > sArr[l + 1]) {
+                    System.out.println("Fail");
+                }
+            }
+        }
+
         // Q5
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
@@ -94,6 +109,23 @@ public class BWT {
                 if (amountComparedEqualTotal - first >= 2) {
                     randomizedQuicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
+            }
+        }
+        
+        // Test V array is sorted
+        for (int i = 0; i < V.length - 2; i++) {
+            int c = V[i];
+            int l = V[i + 1];
+            while (sArr[c] == sArr[l]) {
+                c++;
+                l++;
+            }
+            if (sArr[c] > sArr[l]) {
+                System.out.println("Fejl: " + c);
+                for (int j = -1; j < 50; j++) {
+                    System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
+                }
+                System.out.println();
             }
         }
         
@@ -190,14 +222,14 @@ public class BWT {
         return partition(indexArray, comparedArray, startIndex, endIndex);
     }
 
-    private static int partition(int[] indexArray, int[] comparedArray, int startIndex, int endIndex) {
+    private static int partition(int[] indexArray, int[] comparedArray, int startIndex, int endIndex, int kMin) {
         int pivot = indexArray[endIndex];
         int i = startIndex - 1;
 
         for (int j = startIndex; j < endIndex; j++) {
 
             // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
-            int k = 0;
+            int k = kMin;
             while (true) {
                 if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
                     // If they are not equal, check comparison, and swap if greater than pivot
@@ -206,8 +238,14 @@ public class BWT {
                         swap(indexArray, i, j);
                     }
                     break;
+                } else {
+                    kMin = Math.min(kMin, k);
                 }
                 k += 2;
+            }
+
+            if (kMin > 0) {
+                System.out.println(kMin);
             }
             /*
             for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
