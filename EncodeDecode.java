@@ -15,19 +15,22 @@ import java.util.Random;
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {
 
-        int[] S = {1,1,1,1,1,1,1,1,1,1,3};
+        //int[] S = {4, 4, 1, 1, 2, 2, 3};
+        int[] S = readFile(args[0]);
+        //Arrays.sort(S);
         int[] rowId = {0};
         
-        System.out.println("arrIn: " + Arrays.toString(S) + ", runs: " + countRuns(S) + ", sum: " + sumArr(S));
+        //System.out.println("k=0, arrIn:  " + Arrays.toString(S) + ", runs: " + countRuns(S) + ", sum: " + sumArr(S));
+        System.out.println("k=0, runs: " + countRuns(S) + ", sum: " + sumArr(S) + ", equals: " + countEquals(S));
         int[] outArr = S.clone();
-        for (int i = 0; i < 10; i++) {
-            outArr = BWT2.transform(outArr, rowId);
-            System.out.println("arrOut: " + Arrays.toString(outArr) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr));
+        for (int i = 0; i < 100; i++) {
+            outArr = BWT3.transform(outArr, rowId);
+            //System.out.println("k=" + (i + 1) + ", arrOut: " + Arrays.toString(outArr) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr));
+            System.out.println("k=" + (i + 1) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr) + ", equals: " + countEquals(outArr));
         }
         
 
         //encodeDecodeFile(args[0]);
-
 	}
 
     private static void encodeDecodeFile(String inFileName) throws Exception {
@@ -139,6 +142,17 @@ class EncodeDecode {
         }
 
         return runs;
+    }
+
+    private static int countEquals(int[] arr) {
+        int eqs = 0;
+        for (int i = eqs; i < arr.length + eqs; i++) {
+            if (arr[i % arr.length] == arr[(i + 1) % arr.length]) {
+                eqs++;
+            }
+        }
+
+        return eqs;
     }
 
     private static int sumArr(int[] arr) {

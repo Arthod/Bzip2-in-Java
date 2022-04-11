@@ -1,66 +1,87 @@
 import java.util.Arrays;
 import java.util.Random;
 
+// Variation of BWT but where $ = 256
+
 // TODO see if sArr can be removed.. I assume it can
 // TODO convert input from int to short, and all other places
 
-public class BWT2 {
+public class BWT3 {
+    private final static int unusedByte = 256;
     private final static Random random = new Random();
     
     public static int[] transform(int[] S, int[] rowId) {
-        
+        // Create new array with k=2 EOF characters at the end
+        short[] sArr = new short[S.length + 2];
+        for (int i = 0; i < S.length; i++) {
+            sArr[i] = (short) S[i];
+        }
+        for (int i = 0; i < 2; i++) {
+            sArr[S.length + i] = unusedByte;
+        }
 
+        // Create array W of N words. Pack 2 bytes into 1 integer    Q2
+        int[] W = new int[S.length];
+        for (int i = 0; i < S.length - 2; i++) {
+            if (sArr[i] == unusedByte || sArr[i + 1] == unusedByte) {
+                System.out.println("error");
+                return null;
+            }
+            W[i] = bytesToInt(sArr[i], sArr[i + 1], 0);
+        }
+        W[S.length - 2] = bytesToInt(sArr[S.length - 2], sArr[S.length - 1], 255-1);
+        W[S.length - 1] = bytesToInt(sArr[S.length - 1], 255, 255);
         
         // Array V  Q4
         // Sort by first two characters using radix sort using counting sort
-        int[] V_temp = new int[S.length];
-        int[] V = new int[S.length];
+        int[] V_temp = new int[W.length];
+        int[] V = new int[W.length];
         int k;
-        int[] count = new int[256];
+        int[] count = new int[257];
         int[] countCurrent;
         
         // Radix sort
         // Count the characters (skip the first character)
-        for (int i = 0; i < S.length; i++) {
-            count[S[i]]++;
+        for (int i = 1; i < S.length + 1; i++) {
+            count[sArr[i]]++;
         }
 
-        countCurrent = new int[count.length];
-        countCurrent[0] = count[0];
+        countCurrent = new int[257];
         for (int i = 1; i < count.length; i++) {
             countCurrent[i] = count[i] + countCurrent[i - 1];
         }
         
         // Go in reverse, and write the index
         for (int i = S.length - 1; i >= 0; i--) {
-            k = S[(i + 1) % S.length];
-            V_temp[(countCurrent[k] - 1) % S.length] = i;
+            k = sArr[i + 1];
+            V_temp[countCurrent[k] - 1] = i;
             countCurrent[k]--;
         }
 
         /// Sort by first character
+        count[sArr[0]]++;
         for (int i = 1; i < count.length; i++) {
             count[i] += count[i - 1];
         }
 
         // Go in reverse, and write the index of the index
         for (int i = S.length - 1; i >= 0; i--) {
-            k = S[V_temp[i]];
-            V[(count[k] - 1) % S.length] = V_temp[i];
+            k = sArr[V_temp[i]];
+            V[count[k] - 1] = V_temp[i];
             count[k]--;
         }
 
 
-
+        
         // Test V array is sorted by first two chars
         for (int i = 0; i < V.length - 2; i++) {
             int c = V[i];
             int l = V[i + 1];
-            if (S[c] > S[l]) {
+            if (sArr[c] > sArr[l]) {
                 System.out.println("Fail");
             }
-            if (S[c] == S[l]) {
-                if (S[(c + 1) % S.length] > S[(l + 1) % S.length]) {
+            if (sArr[c] == sArr[l]) {
+                if (sArr[c + 1] > sArr[l + 1]) {
                     System.out.println("Fail");
                 }
             }
@@ -69,13 +90,14 @@ public class BWT2 {
         // Q5
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
         int first = 0;
-        for (int ch1 = 0; ch1 < 256; ch1++) {
+        for (int ch1 = 0; ch1 < 257; ch1++) {
             // Q6
-            for (int ch2 = 0; ch2 < 256 && amountComparedEqualTotal < S.length; ch2++) {
+            for (int ch2 = 0; ch2 < 257 && amountComparedEqualTotal < S.length; ch2++) {
                 // We know that V is sorted by the first two characters
                 first = amountComparedEqualTotal;
+                
 
-                while (ch1 == S[V[amountComparedEqualTotal]] && ch2 == S[(V[amountComparedEqualTotal] + 1) % S.length]) {
+                while (ch1 == sArr[V[amountComparedEqualTotal]] && ch2 == sArr[V[amountComparedEqualTotal] + 1]) {
                     amountComparedEqualTotal++;
                     
                     // If reached end of input, stop all
@@ -86,20 +108,36 @@ public class BWT2 {
 
                 // If there's atleast two that are compared equal we need to sort them.
                 if (amountComparedEqualTotal - first >= 2) {
-                    randomizedQuicksortIndexArray(V, S, first, amountComparedEqualTotal - 1);
+                    randomizedQuicksortIndexArray(V, W, first, amountComparedEqualTotal - 1);
                 }
             }
         }
 
+
+        // Test V array is sorted
+        for (int i = 0; i < V.length - 2; i++) {
+            int c = V[i];
+            int l = V[i + 1];
+            while (sArr[c] == sArr[l]) {
+                c++;
+                l++;
+            }
+            if (sArr[c] > sArr[l]) {
+                System.out.println("Fejl: " + c);
+                for (int j = -1; j < 50; j++) {
+                    System.out.print(new String(new byte[] { (byte) sArr[c + j] }));
+                }
+                System.out.println();
+            }
+        }
+        
         // Now our V has the correctly sorted indicies of the square
         // Now we fetch the last column of the BWT square
         // We also write the row index to the last index of the out array
-        int[] outArr = new int[S.length];
-        for (int i = 0; i < S.length; i++) {
-            //outArr[i] = S[V[i] - 1];
+        int[] outArr = new int[W.length];
+        for (int i = 0; i < outArr.length; i++) {
             outArr[i] = S[Math.floorMod(V[i] - 1, S.length)];
         }
-        //outArr[0] = S[S.length - 1];
 
         return outArr;
     }
@@ -184,20 +222,23 @@ public class BWT2 {
 
         for (int j = startIndex; j < endIndex; j++) {
 
-            for (int k = 2; k < indexArray.length - 2; k++) {
-                if (comparedArray[(indexArray[j] + k) % indexArray.length] != comparedArray[(pivot + k) % indexArray.length]) {
+            // TODO: can optimize.. We know first two characters of the word are already sorted, no need to recheck them
+            int k = 0;
+            while (true) {
+                if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
                     // If they are not equal, check comparison, and swap if greater than pivot
-                    if (comparedArray[(indexArray[j] + k) % indexArray.length] <= comparedArray[(pivot + k) % indexArray.length]) {
+                    if (comparedArray[indexArray[j] + k] <= comparedArray[pivot + k]) {
                         i++;
                         swap(indexArray, i, j);
                     }
                     break;
                 }
+                k += 2;
             }
             /*
-            for (int k = 0; k < comparedArray.length; k += 2) {
+            for (int k = 0; k < comparedArray.length - indexLimit; k += 2) {
                 // Check if they are equal
-                if (comparedArray[indexArray[j] + k + indexLimit] != comparedArray[pivot + k]) {
+                if (comparedArray[indexArray[j] + k] != comparedArray[pivot + k]) {
                     // If they are not equal, check comparison, and swap if greater than pivot
                     if (comparedArray[indexArray[j] + k] <= comparedArray[pivot + k]) {
                         i++;
