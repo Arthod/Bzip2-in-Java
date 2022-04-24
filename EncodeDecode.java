@@ -15,20 +15,49 @@ import java.util.Random;
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {
 
-        //int[] S = {4, 4, 1, 1, 2, 2, 3};
+        //int[] S = {4,1,2,2,1,2,2,1,3,3,1,255};
         int[] S = readFile(args[0]);
         //Arrays.sort(S);
         int[] rowId = {0};
         
-        //System.out.println("k=0, arrIn:  " + Arrays.toString(S) + ", runs: " + countRuns(S) + ", sum: " + sumArr(S));
-        System.out.println("k=0, runs: " + countRuns(S) + ", sum: " + sumArr(S) + ", equals: " + countEquals(S));
+        if (S.length <= 100) 
+            System.out.println("k=0, arrIn:  " + Arrays.toString(S) + ", runs: " + countRuns(S) + ", sum: " + sumArr(S) + ", equals: " + countEquals(S));
+        else
+            System.out.println("k=0, runs: " + countRuns(S) + ", sum: " + sumArr(S) + ", equals: " + countEquals(S));
         int[] outArr = S.clone();
         for (int i = 0; i < 100; i++) {
-            outArr = BWT3.transform(outArr, rowId);
-            //System.out.println("k=" + (i + 1) + ", arrOut: " + Arrays.toString(outArr) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr));
-            System.out.println("k=" + (i + 1) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr) + ", equals: " + countEquals(outArr));
+            outArr = BWT2.transform(outArr, rowId);
+            if (S.length <= 100)
+                System.out.println("k=" + (i + 1) + ", arrOut: " + Arrays.toString(outArr) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr) + ", equals: " + countEquals(outArr));
+            else
+                System.out.println("k=" + (i + 1) + ", runs: " + countRuns(outArr) + ", sum: " + sumArr(outArr) + ", equals: " + countEquals(outArr));
         }
-        
+
+        /*
+        for (int i = 0; i < 10000; i++) {
+            int[] inArr = new int[100];
+            Random random = new Random();
+            for (int j = 0; j < inArr.length; j++) {
+                inArr[j] = Math.floorMod(random.nextInt(), 3) * 256/3;
+            }
+            int[] tempArr = inArr.clone();
+            int[] rowId = new int[1];
+            String encodedFileName = "encoded.txt";
+
+            tempArr = BWT.transform(tempArr, rowId);
+            tempArr = MoveToFront.encode(tempArr);
+            tempArr = Huffman.encode(tempArr);
+
+            writeToFile(encodedFileName, tempArr);
+            tempArr = readFile(encodedFileName);
+
+            tempArr = Huffman.decode(tempArr);
+            tempArr = MoveToFront.decode(tempArr);
+            tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+
+            isEqual(tempArr, inArr);
+
+        }*/
 
         //encodeDecodeFile(args[0]);
 	}
@@ -36,7 +65,7 @@ class EncodeDecode {
     private static void encodeDecodeFile(String inFileName) throws Exception {
 
 		// File input and bit output
-        String encodedFileName = "encoded.txt";
+        String encodedFileName = "encoded.bbzip2";
         String outFileName = "decoded.txt";
 
         int[] inArr = readFile(inFileName);
@@ -46,7 +75,7 @@ class EncodeDecode {
         int[] rowId = new int[1];
 
         System.out.println("BWT transforming");
-        tempArr = BWT2.transform(tempArr, rowId);
+        tempArr = BWT.transform(tempArr, rowId);
         System.out.println("MTF encoding");
         tempArr = MoveToFront.encode(tempArr);
         System.out.println("Huffman encoding");
@@ -78,7 +107,7 @@ class EncodeDecode {
 
         // Turn inFile into array
         int bytesAmount = (int) inFile.getChannel().size();
-        int[] arr = new int[bytesAmount];
+        int[] arr = new int[bytesAmount + 1];
         
         // Iterate through all bytes in file and write to array
         int byteRead = 0;
@@ -88,6 +117,7 @@ class EncodeDecode {
             k++;
         }
         inFile.close();
+        arr[arr.length - 1] = 255;
 
         return arr;
     }

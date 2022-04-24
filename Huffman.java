@@ -1,12 +1,16 @@
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Huffman {
-	private static String[] codes = new String[256];
-    private static int[] frequency = new int[256];
+	private static String[] codes = new String[258];
+    private static int[] frequency = new int[258];
 
     public static int[] encode(int[] inArr) throws IOException {
+        codes = new String[258];
+        frequency = new int[258];
+
 		// Bit output
 		IntArrayOutputStream outArrayStream = new IntArrayOutputStream(inArr.length);
 		BitOutputStream outBit = new BitOutputStream(outArrayStream);
@@ -30,7 +34,7 @@ public class Huffman {
 			String code = codes[inArr[i]];
 			for (int j = 0; j < code.length(); j++) {
 				outBit.writeBit(Character.getNumericValue(code.charAt(j)));
-			}            
+			}
         }
 
         // Close out bit stream
@@ -41,6 +45,9 @@ public class Huffman {
     }
     
     public static int[] decode(int[] inArr) throws Exception {
+        codes = new String[258];
+        frequency = new int[258];
+        
         // Bit input
         IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
         BitInputStream inBit = new BitInputStream(inArrayStream);
@@ -65,7 +72,7 @@ public class Huffman {
         // out-file and repeats. This loop ends when the sum of frequencies is reached.
         while (leafReachedCount < sum) {
             if (elementAt.getData() instanceof Node) {
-                int nextBit = inBit.readBit(); 
+                int nextBit = inBit.readBit();
                 if (nextBit == 0) {
                     elementAt = ((Node) elementAt.getData()).getLeft();
                 } else {
