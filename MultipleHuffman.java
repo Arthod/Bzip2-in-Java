@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public class MultipleHuffman {
     private static int CHAR_MAX = 257;
-    private static int TREES_IMPROVE_ITER = 10;    // Amount of times to improve the huffman trees, default 3
-    private static int TREES_COUNT = 4; // Amount of huffman trees, default 6
-    private static int BLOCK_SIZE = 300; // Bytes block size, default 50
-    private static int CODE_LENGTH_MAX = 15;
+    private static int TREES_IMPROVE_ITER = 3;    // Amount of times to improve the huffman trees, default 3
+    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
+    private static int BLOCK_SIZE = 500; // Bytes block size, default 50
+    private static int CODE_LENGTH_MAX = 15;    // Initial max code length, default 15
     private static int CODE_LENGTH_MIN = 0;
 
 
@@ -36,7 +36,7 @@ public class MultipleHuffman {
             }
 
             // Remove last high if not needed
-            if (high > low && i != 0 && i != TREES_COUNT - 1 && ((TREES_COUNT - (TREES_COUNT - i)) % 2 == 1)) {
+            if (high > low && i != 0 && i != TREES_COUNT - 1 && i % 2 == 1) {
                 frequencyTreeCounter -= frequency[high];
                 high--;
             }
