@@ -4,25 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Huffman {
-	private static String[] codes = new String[258];
-    private static int[] frequency = new int[258];
-
     public static int[] encode(int[] inArr) throws IOException {
-        codes = new String[258];
-        frequency = new int[258];
-
 		// Bit output
 		IntArrayOutputStream outArrayStream = new IntArrayOutputStream(inArr.length);
 		BitOutputStream outBit = new BitOutputStream(outArrayStream);
 
 		// Reading input array
+        int[] frequency = new int[258];
         for (int i = 0; i < inArr.length; i++) {
             frequency[inArr[i]]++;
         }
 
 		// Generating the Huffman tree and then the codes
 		Element root = huffmanTree(frequency);
-		generateCode(root);
+		String[] codes = generateCode(root);
 
 		// Writing frequency to file
 		for (int i = 0; i < frequency.length; i++) {
@@ -44,10 +39,7 @@ public class Huffman {
         return outArrayStream.toIntArray();
     }
     
-    public static int[] decode(int[] inArr) throws Exception {
-        codes = new String[258];
-        frequency = new int[258];
-        
+    public static int[] decode(int[] inArr) throws Exception {        
         // Bit input
         IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
         BitInputStream inBit = new BitInputStream(inArrayStream);
@@ -55,6 +47,7 @@ public class Huffman {
 
         // Read and sum the frequencies from file
         int sum = 0;
+        int[] frequency = new int[258];
         for (int i = 0; i < frequency.length; i++) {
             frequency[i] = inBit.readInt();
             sum += frequency[i];
@@ -116,16 +109,19 @@ public class Huffman {
  	 * code of a specific leaf is the boolean left and right traverses needed to 
  	 * reach it from the root.
 	 */
-	private static void generateCode(Element e, String tempcode) {
+	private static void generateCode(Element e, String[] codes, String tempcode) {
 		if (e.getData() instanceof Node) {
 			Node n = (Node) e.getData();
-			generateCode(n.getLeft(), tempcode + "0");
-			generateCode(n.getRight(), tempcode + "1");
+			generateCode(n.getLeft(), codes, tempcode + "0");
+			generateCode(n.getRight(), codes, tempcode + "1");
 		} else {
 			codes[(int) e.getData()] = tempcode;
 		}
 	}
-    private static void generateCode(Element e) {
-		generateCode(e, "");
+    public static String[] generateCode(Element root) {
+        String[] codes = new String[258];
+		generateCode(root, codes, "");
+
+        return codes;
     }
 }
