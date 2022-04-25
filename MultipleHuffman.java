@@ -5,14 +5,11 @@ import java.util.Arrays;
 
 public class MultipleHuffman {
     private static int CHAR_MAX = 257;
-    private static int TREES_IMPROVE_ITER = 3;    // Amount of times to improve the huffman trees, default 3
-    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
-    private static int BLOCK_SIZE = 500; // Bytes block size, default 50
     private static int CODE_LENGTH_MAX = 15;    // Initial max code length, default 15
     private static int CODE_LENGTH_MIN = 0;
 
 
-    public static int[] encode(int[] inArr) throws IOException {
+    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE) throws IOException {
         // Count frequency of each character in the text
         int[] frequency = new int[CHAR_MAX + 1];
         for (int i = 0; i < inArr.length; i++) {
@@ -175,7 +172,7 @@ public class MultipleHuffman {
         return outArrayStream.toIntArray();
     }
     
-    public static int[] decode(int[] inArr) throws IOException {
+    public static int[] decode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE) throws IOException {
         // Bit input
         IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
         BitInputStream inBit = new BitInputStream(inArrayStream);

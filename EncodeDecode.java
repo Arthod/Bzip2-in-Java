@@ -14,81 +14,43 @@ import java.util.Random;
 
 class EncodeDecode {
 	public static void main(String[] args) throws Exception {
-        int[] inArr = readFile(args[0]);
-        String encodedFileName = "encoded_BWTMTFRLEMHUFF.txt";
+        // Args
+        String inFileName = args[0];
+        String encodedFileName = "encoded.txt";
         String outFileName = "decoded.txt";
-        
+        int TREES_IMPROVE_ITER = Integer.parseInt(args[1]);    // Amount of times to improve the huffman trees, default 3
+        int TREES_COUNT = Integer.parseInt(args[2]); // Amount of huffman trees, default 6
+        int BLOCK_SIZE = Integer.parseInt(args[3]); // Bytes block size, default 50
+
+
         // Compression
+        int[] inArr = readFile(inFileName);
         int[] tempArr = inArr.clone();
         int[] rowId = new int[1];
 
-        System.out.println("BWT transforming");
         tempArr = BWT.transform(tempArr, rowId);
-        System.out.println("MTF & RLE encoding");
         tempArr = MoveToFront.encode(tempArr);
-        System.out.println("Multiple Huffman encoding");
-        tempArr = MultipleHuffman.encode(tempArr);
+        tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
 
-        writeToFile(encodedFileName, tempArr);
+        System.out.println(tempArr.length);
+        /*writeToFile(encodedFileName, tempArr);
         tempArr = readFile(encodedFileName);
+
         // Decompression
-        System.out.println("Multiple Huffman decoding");
-        tempArr = MultipleHuffman.decode(tempArr);
-        System.out.println("MTF & RLE decoding");
+        tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
         tempArr = MoveToFront.decode(tempArr);
-        System.out.println("BWT reverse transforming");
         tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
-        System.out.println("Writing decoded to file");
         writeToFile(outFileName, tempArr);
+
         
         if (!isEqual(tempArr, inArr)) {
             System.out.println("ERROR, NOT EQUAL");
             return;
-        }
+        }*/
 	}
 
-    private static void encodeDecodeFile(String inFileName) throws Exception {
-
-		// File input and bit output
-        String encodedFileName = "encoded_BWTMTFRLEHUFF.txt";
-        String outFileName = "decoded.txt";
-
-        int[] inArr = readFile(inFileName);
-
-        // Compression
-        int[] tempArr = inArr.clone();
-        int[] rowId = new int[1];
-
-        System.out.println("BWT transforming");
-        tempArr = BWT.transform(tempArr, rowId);
-        System.out.println("MTF encoding");
-        tempArr = MoveToFront.encode(tempArr);
-        System.out.println("Huffman encoding");
-        tempArr = Huffman.encode(tempArr);
-
-        // Write encoded to file, and read again from it (this step is required for Huffman encoding to work (for some reason...))
-        System.out.println("Writing encoded to file");
-        writeToFile(encodedFileName, tempArr);
-        tempArr = readFile(encodedFileName);
-
-        // Decompression
-        System.out.println("Huffman decoding");
-        tempArr = Huffman.decode(tempArr);
-        System.out.println("MTF decoding");
-        tempArr = MoveToFront.decode(tempArr);
-        System.out.println("BWT reverse transforming");
-        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
-        
-        // Write out to file
-        System.out.println("Writing decoded to file");
-        writeToFile(outFileName, tempArr);
-
-        
-        isEqual(tempArr, inArr);
-    }
-    
     private static int[] readFile(String inFileName) throws Exception {
         FileInputStream inFile = new FileInputStream(inFileName);
 

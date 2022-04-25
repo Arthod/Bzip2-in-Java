@@ -1,40 +1,76 @@
 import os
+import matplotlib.pyplot as plt
+import subprocess
 
-
-def get_runs(file_path):
-    f = open(file_path, "r")
-    arr = []
-    for x in f:
-        arr.append(int(x.replace("\n", "")))
-    return arr
 
 cantrbry_path = "cantrbry/"
-files = os.listdir(cantrbry_path)
-file_paths = []
+filenames = os.listdir(cantrbry_path)
 
-cantrbry_runs_path = "cantrbryBWTRuns2/"
-other_runs = {}
+# Plot raw file sizes
+xx = [filename for filename in filenames]
+yy = [os.path.getsize(cantrbry_path + filename) for filename in filenames]
+plt.plot(xx, yy, "-", marker="o", label="raw")
 
-other_runs_path = "cantrbryBWTRuns/"
-cantrbry_runs = {}
+def get_text_call(filename, trees_improve_iter=3, trees_count=6, block_size=50):
+    return ["java", "EncodeDecode", str(filename), str(trees_improve_iter), str(trees_count), str(block_size)]
 
-for file_name in files:
-    file_paths.append(cantrbry_path + file_name)
-    other_runs[file_name] = get_runs(other_runs_path + file_name)
-    try:
-        cantrbry_runs[file_name] = get_runs(cantrbry_runs_path + file_name)
-    except:
-        pass
+# Call EncodeDecode
+# String filename, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE
 
+print(xx)
+# Block size
+print("Block size")
+for i in [30, 50, 100, 200, 300, 500, 1000, 2000]:
+    yy = []
+    for f in filenames:
+        filename = cantrbry_path + f
+        
+        cmdtext = get_text_call(filename, block_size=i)
+        result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
+        yy.append(int(result))
 
-# Plot it
-
-import matplotlib.pyplot as plt
-for file_name in cantrbry_runs:
-    plt.plot([i for i in range(len(cantrbry_runs[file_name]))], cantrbry_runs[file_name], "-", marker="o", label=file_name)
+    print(i, *yy, sep=' ')
+    plt.plot(xx, yy, "-", marker="o", label=f"Block size = {i}")
 
 plt.legend()
-#plt.yscale("log")
+plt.ticklabel_format(style='plain', axis='y')
+plt.show()
+
+# Trees improve iter
+print("Trees improve iter")
+for i in range(1, 8+1):
+    yy = []
+    for f in filenames:
+        filename = cantrbry_path + f
+        
+        cmdtext = get_text_call(filename, trees_improve_iter=i)
+        result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
+        yy.append(int(result))
+
+    print(i, *yy, sep=' ')
+    plt.plot(xx, yy, "-", marker="o", label=f"trees improve iter = {i}")
+
+plt.legend()
+plt.ticklabel_format(style='plain', axis='y')
+plt.show()
+
+# Tree count
+print("Trees count")
+for i in range(1, 8+1):
+    yy = []
+    for f in filenames:
+        filename = cantrbry_path + f
+        
+        cmdtext = get_text_call(filename, trees_count=i)
+        result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
+        yy.append(int(result))
+
+    print(i, *yy, sep=' ')
+    plt.plot(xx, yy, "-", marker="o", label=f"trees_count = {i}")
+    
+
+plt.legend()
+plt.ticklabel_format(style='plain', axis='y')
 plt.show()
 
 
