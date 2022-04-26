@@ -21,6 +21,7 @@ class EncodeDecode {
         int TREES_IMPROVE_ITER = Integer.parseInt(args[1]);    // Amount of times to improve the huffman trees, default 3
         int TREES_COUNT = Integer.parseInt(args[2]); // Amount of huffman trees, default 6
         int BLOCK_SIZE = Integer.parseInt(args[3]); // Bytes block size, default 50
+        Boolean RLE = Boolean.parseBoolean(args[4]);
 
 
         // Compression
@@ -29,26 +30,26 @@ class EncodeDecode {
         int[] rowId = new int[1];
 
         tempArr = BWT.transform(tempArr, rowId);
-        tempArr = MoveToFront.encode(tempArr);
+        tempArr = MoveToFront.encode(tempArr, RLE);
         tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
 
         System.out.println(tempArr.length);
-        /*writeToFile(encodedFileName, tempArr);
-        tempArr = readFile(encodedFileName);
+        //writeToFile(encodedFileName, tempArr);
+        //tempArr = readFile(encodedFileName);
 
         // Decompression
-        tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
-        tempArr = MoveToFront.decode(tempArr);
-        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        //tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        //tempArr = MoveToFront.decode(tempArr, RLE);
+        //tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
-        writeToFile(outFileName, tempArr);
+        //writeToFile(outFileName, tempArr);
 
         
-        if (!isEqual(tempArr, inArr)) {
-            System.out.println("ERROR, NOT EQUAL");
-            return;
-        }*/
+        //if (!isEqual(tempArr, inArr)) {
+        //    System.out.println("ERROR, NOT EQUAL");
+        //    return;
+        //}
 	}
 
     private static int[] readFile(String inFileName) throws Exception {

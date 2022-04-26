@@ -11,13 +11,32 @@ xx = [filename for filename in filenames]
 yy = [os.path.getsize(cantrbry_path + filename) for filename in filenames]
 plt.plot(xx, yy, "-", marker="o", label="raw")
 
-def get_text_call(filename, trees_improve_iter=3, trees_count=6, block_size=50):
-    return ["java", "EncodeDecode", str(filename), str(trees_improve_iter), str(trees_count), str(block_size)]
+def get_text_call(filename, trees_improve_iter=3, trees_count=6, block_size=50, RLE="true"):
+    return ["java", "EncodeDecode", str(filename), str(trees_improve_iter), str(trees_count), str(block_size), RLE]
 
 # Call EncodeDecode
 # String filename, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE
 
 print(xx)
+# RLE?
+print("RLE")
+for rle in ["false", "true"]:
+    yy = []
+    for f in filenames:
+        filename = cantrbry_path + f
+        
+        cmdtext = get_text_call(filename, RLE=rle)
+        result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
+        yy.append(int(result))
+
+    print(rle, *yy, sep=' ')
+    plt.plot(xx, yy, "-", marker="o", label=f"RLE = {rle}")
+
+plt.legend()
+plt.ticklabel_format(style='plain', axis='y')
+plt.show()
+
+
 # Block size
 print("Block size")
 for i in [30, 50, 100, 200, 300, 500, 1000, 2000]:
@@ -56,7 +75,7 @@ plt.show()
 
 # Tree count
 print("Trees count")
-for i in range(1, 8+1):
+for i in range(1, 16+1):
     yy = []
     for f in filenames:
         filename = cantrbry_path + f

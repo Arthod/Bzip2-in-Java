@@ -22,9 +22,9 @@ public class MoveToFront {
     }
 
     private static void test(int[] inArr) {
-        int[] encoded = encode(inArr);
+        int[] encoded = encode(inArr, false);
         //System.out.println(Arrays.toString(encoded));
-        int[] outArr = decode(encoded);
+        int[] outArr = decode(encoded, false);
         //System.out.println(Arrays.toString(inArr));
         //System.out.println(Arrays.toString(outArr));
 
@@ -47,7 +47,7 @@ public class MoveToFront {
     }
     
     
-    public static int[] encode(int[] inArr) {
+    public static int[] encode(int[] inArr, Boolean RLE) {
         // Init out array
         offset = 0;
         int[] outArr = new int[inArr.length];
@@ -79,7 +79,7 @@ public class MoveToFront {
 
             // If index of byte is 0, we can run-length encode it
             // Count amount of consecutive 0's, this will be k
-            if (indexOfByte == 0) {
+            if (indexOfByte == 0 && RLE) {
                 int k = 1;
                 while (i + k < inArr.length && byteRead == inArr[i + k]) {
                     k++;
@@ -116,7 +116,7 @@ public class MoveToFront {
         return outArr2;
     }
 
-    public static int[] decode(int[] inArr) {
+    public static int[] decode(int[] inArr, Boolean RLE) {
         // Init out array
         ArrayList<Integer> outList = new ArrayList<Integer>(inArr.length);
 
@@ -132,7 +132,7 @@ public class MoveToFront {
             // Read from array (in)
             byteRead = inArr[i];
             
-            if (byteRead == runA || byteRead == runB) {
+            if ((byteRead == runA || byteRead == runB) && RLE) {
                 String s;
                 if (byteRead == runA) {
                     s = "0";
