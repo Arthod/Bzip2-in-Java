@@ -29,27 +29,31 @@ class EncodeDecode {
         int[] tempArr = inArr.clone();
         int[] rowId = new int[1];
 
+        System.out.println("BWT transform");
         tempArr = BWT.transform(tempArr, rowId);
+        System.out.println("MTF&RLE encoding");
         tempArr = MoveToFront.encode(tempArr, RLE);
+        System.out.println("MHUFFMAN encoding");
         tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
 
         System.out.println(tempArr.length);
-        //writeToFile(encodedFileName, tempArr);
-        //tempArr = readFile(encodedFileName);
+        System.out.println("Saving to file encoding");
+        writeToFile(encodedFileName, tempArr);
+        tempArr = readFile(encodedFileName);
 
         // Decompression
-        //tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
-        //tempArr = MoveToFront.decode(tempArr, RLE);
-        //tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        tempArr = MoveToFront.decode(tempArr, RLE);
+        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         
         // Write out to file
-        //writeToFile(outFileName, tempArr);
+        writeToFile(outFileName, tempArr);
 
         
-        //if (!isEqual(tempArr, inArr)) {
-        //    System.out.println("ERROR, NOT EQUAL");
-        //    return;
-        //}
+        if (!isEqual(tempArr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL");
+            return;
+        }
 	}
 
     private static int[] readFile(String inFileName) throws Exception {
@@ -57,17 +61,15 @@ class EncodeDecode {
 
         // Turn inFile into array
         int bytesAmount = (int) inFile.getChannel().size();
-        int[] arr = new int[bytesAmount + 1];
+        int[] arr = new int[bytesAmount];
         
         // Iterate through all bytes in file and write to array
         int byteRead = 0;
         int k = 0;
         while ((byteRead = inFile.read()) != -1) {
-            arr[k] = byteRead;
-            k++;
+            arr[k++] = byteRead;
         }
         inFile.close();
-        arr[arr.length - 1] = 255;
 
         return arr;
     }

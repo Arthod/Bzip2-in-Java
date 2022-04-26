@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MultipleHuffman {
-    private static int CHAR_MAX = 257;
+    private static int CHAR_MAX = 256;
     private static int CODE_LENGTH_MAX = 15;    // Initial max code length, default 15
     private static int CODE_LENGTH_MIN = 0;
 
@@ -33,7 +33,7 @@ public class MultipleHuffman {
             }
 
             // Remove last high if not needed
-            if (high > low && i != 0 && i != TREES_COUNT - 1 && i % 2 == 1) {
+            if (high > low && i != 0 && i % 2 == 1) {
                 frequencyTreeCounter -= frequency[high];
                 high--;
             }
@@ -41,7 +41,7 @@ public class MultipleHuffman {
             // Print
             String s = String.format("initial group %d, [%d .. %d], has %d syms (%4.1f%%)",
                 i, low, high, frequencyTreeCounter, (100.0 * (float) frequencyTreeCounter) / (float) (inArr.length));
-            // System.out.println(s);
+            System.out.println(s);
 
             // Set code lengths for the interval. 0 if in interval, 15 otherwise.
             for (int j = 0; j <= CHAR_MAX; j++) {

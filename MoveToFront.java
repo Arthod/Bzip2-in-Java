@@ -4,8 +4,8 @@ import java.util.Random;
 
 public class MoveToFront {
     private static int[] recentlyUsedSymbols = new int[256];
-    private static int runA = 256;
-    private static int runB = 257;
+    private static int runA = 0;
+    private static int runB = 1;
     private static int offset = 0;
 
 
@@ -103,7 +103,7 @@ public class MoveToFront {
                 recentlyUsedSymbols[0] = byteRead;
                 
                 // Write to array (out)
-                outArr[i - offset] = indexOfByte;
+                outArr[i - offset] = indexOfByte + 1;
             }
         }
 
@@ -159,6 +159,7 @@ public class MoveToFront {
 
             } else {
                 // Get the byte in that index position of the byte read
+                byteRead = byteRead - 1;
                 charOfByte = recentlyUsedSymbols[byteRead];
 
                 // Shift all indicies to the right, until element
