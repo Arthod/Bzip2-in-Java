@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import subprocess
 
 
-cantrbry_path = "cantrbry/"
+cantrbry_path = "mycorpus/"
 filenames = os.listdir(cantrbry_path)
 
 # Plot raw file sizes
@@ -11,30 +11,24 @@ xx = [filename for filename in filenames]
 yy = [os.path.getsize(cantrbry_path + filename) for filename in filenames]
 plt.plot(xx, yy, "-", marker="o", label="raw")
 
-def get_text_call(filename, trees_improve_iter=3, trees_count=6, block_size=50, RLE="true"):
-    return ["java", "EncodeDecode", str(filename), str(trees_improve_iter), str(trees_count), str(block_size), RLE]
+def get_text_call(filename, trees_improve_iter=None, trees_count=None, block_size=None, RLE=None):
+    X = ["java", "EncodeDecode", str(filename)]
+    if (trees_improve_iter is not None):
+        X = X + ["-it", str(trees_improve_iter)]
+    if (trees_count is not None):
+        X = X + ["-tc", str(trees_count)]
+    if (block_size is not None):
+        X = X + ["-bs", str(block_size)]
+    if (RLE is not None):
+        X = X + ["-rle", RLE]
+
+    return X
 
 # Call EncodeDecode
 # String filename, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE
 
-print(xx)
-# RLE?
-print("RLE")
-for rle in ["false", "true"]:
-    yy = []
-    for f in filenames:
-        filename = cantrbry_path + f
-        
-        cmdtext = get_text_call(filename, RLE=rle)
-        result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
-        yy.append(int(result))
-
-    print(rle, *yy, sep=' ')
-    plt.plot(xx, yy, "-", marker="o", label=f"RLE = {rle}")
-
-plt.legend()
-plt.ticklabel_format(style='plain', axis='y')
-plt.show()
+print(*xx, sep=';')
+    
 
 
 # Block size
@@ -48,16 +42,12 @@ for i in [30, 50, 100, 200, 300, 500, 1000, 2000]:
         result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
         yy.append(int(result))
 
-    print(i, *yy, sep=' ')
-    plt.plot(xx, yy, "-", marker="o", label=f"Block size = {i}")
-
-plt.legend()
-plt.ticklabel_format(style='plain', axis='y')
-plt.show()
+    print(i, *yy, sep=';')
+    
 
 # Trees improve iter
 print("Trees improve iter")
-for i in range(1, 8+1):
+for i in range(0, 16+1):
     yy = []
     for f in filenames:
         filename = cantrbry_path + f
@@ -66,12 +56,8 @@ for i in range(1, 8+1):
         result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
         yy.append(int(result))
 
-    print(i, *yy, sep=' ')
-    plt.plot(xx, yy, "-", marker="o", label=f"trees improve iter = {i}")
-
-plt.legend()
-plt.ticklabel_format(style='plain', axis='y')
-plt.show()
+    print(i, *yy, sep=';')
+    
 
 # Tree count
 print("Trees count")
@@ -84,14 +70,21 @@ for i in range(1, 16+1):
         result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
         yy.append(int(result))
 
-    print(i, *yy, sep=' ')
-    plt.plot(xx, yy, "-", marker="o", label=f"trees_count = {i}")
+    print(i, *yy, sep=';')
     
 
-plt.legend()
-plt.ticklabel_format(style='plain', axis='y')
-plt.show()
+# RLE?
+print("RLE")
+for rle in ["false", "true"]:
+    yy = []
+    for f in filenames:
+        filename = cantrbry_path + f
+        
+        cmdtext = get_text_call(filename, RLE=rle)
+        result = subprocess.check_output(cmdtext, stderr=subprocess.STDOUT)
+        yy.append(int(result))
 
+    print(rle, *yy, sep=';')
 
 """
 for file_name in other_runs:

@@ -13,48 +13,101 @@ import java.util.Random;
 //      happens when I use arrays.
 
 class EncodeDecode {
+    private static int TREES_IMPROVE_ITER = 3; // Amount of times to improve the huffman trees, default 3
+    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
+    private static int BLOCK_SIZE = 50; // Bytes block size, default 50
+    private static Boolean RLE = true;
+    private static int DEBUG_LEVEL = 0; // 0..5
+
 	public static void main(String[] args) throws Exception {
         // Args
         String inFileName = args[0];
-        String encodedFileName = "encoded.txt";
-        String outFileName = "decoded.txt";
-        int TREES_IMPROVE_ITER = Integer.parseInt(args[1]);    // Amount of times to improve the huffman trees, default 3
-        int TREES_COUNT = Integer.parseInt(args[2]); // Amount of huffman trees, default 6
-        int BLOCK_SIZE = Integer.parseInt(args[3]); // Bytes block size, default 50
-        Boolean RLE = Boolean.parseBoolean(args[4]);
+
+        if (args.length > 1) {
+            String flag = args[1];
+            if (flag.equals("-it")) {
+                TREES_IMPROVE_ITER = Integer.parseInt(args[2]);
+
+            } else if (flag.equals("-tc")) {
+                TREES_COUNT = Integer.parseInt(args[2]);
+
+            } else if (flag.equals("-bs")) {
+                BLOCK_SIZE = Integer.parseInt(args[2]);
+
+            } else if (flag.equals("-rle")) {
+                RLE = Boolean.parseBoolean(args[2]);
+
+            } else {
+                //System.out.println("Read no flags");
+            }
+        } else {
+            //System.out.println("Read no flags");
+        }
+        //System.out.println("Input: " + inFileName);
+        //System.out.println("Trees Improve Iter: " + TREES_IMPROVE_ITER);
+        //System.out.println("Trees Count: " + TREES_COUNT);
+        //System.out.println("Block Size: " + BLOCK_SIZE);
+        //System.out.println("RLE: " + RLE);
 
 
-        // Compression
+        // Read raw file
         int[] inArr = readFile(inFileName);
-        int[] tempArr = inArr.clone();
         int[] rowId = new int[1];
 
-        System.out.println("BWT transform");
-        tempArr = BWT.transform(tempArr, rowId);
-        System.out.println("MTF&RLE encoding");
-        tempArr = MoveToFront.encode(tempArr, RLE);
-        System.out.println("MHUFFMAN encoding");
-        tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        // Compress raw file
+        int[] tempArr = compress(inArr, rowId);
 
         System.out.println(tempArr.length);
-        System.out.println("Saving to file encoding");
+        /*
+        String encodedFileName = "encoded.txt";
+        String outFileName = "decoded.txt";
+        if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
+
+        // Write encoded file
         writeToFile(encodedFileName, tempArr);
+
+        // Re-read encoded file
         tempArr = readFile(encodedFileName);
 
-        // Decompression
-        tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
-        tempArr = MoveToFront.decode(tempArr, RLE);
-        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        // Decompres encoded file
+        tempArr = decompress(tempArr, rowId);
         
-        // Write out to file
+        // Write decompressed file
         writeToFile(outFileName, tempArr);
 
-        
+        // Check for errors        
         if (!isEqual(tempArr, inArr)) {
             System.out.println("ERROR, NOT EQUAL");
             return;
-        }
+        }*/
 	}
+
+    private static int[] compress(int[] arr, int[] rowId) throws IOException {
+        // Compression
+        if (DEBUG_LEVEL >= 1) System.out.println("Burrows-Wheeler transform");
+        int[] tempArr = BWT.transform(arr, rowId);
+
+        if (DEBUG_LEVEL >= 1) System.out.println("MoveToFront & Run-Length encoding");
+        tempArr = MoveToFront.encode(tempArr, RLE);
+
+        if (DEBUG_LEVEL >= 1) System.out.println("Multiple Huffman encoding");
+        tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        
+        return tempArr;
+    }
+    private static int[] decompress(int[] arr, int[] rowId) throws IOException {
+        // Decompression
+        if (DEBUG_LEVEL >= 1) System.out.println("Multiple Huffman decoding");
+        int[] tempArr = MultipleHuffman.decode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+
+        if (DEBUG_LEVEL >= 1) System.out.println("MoveToFront & Run-Length decoding");
+        tempArr = MoveToFront.decode(tempArr, RLE);
+
+        if (DEBUG_LEVEL >= 1) System.out.println("Burrows-Wheeler reverse transform");
+        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        
+        return tempArr;
+    }
 
     private static int[] readFile(String inFileName) throws Exception {
         FileInputStream inFile = new FileInputStream(inFileName);
@@ -111,37 +164,4 @@ class EncodeDecode {
         return true;
     }
 
-    private static int countRuns(int[] arr) {
-        return countRuns(arr, 0);
-    }
-
-    private static int countRuns(int[] arr, int index) {
-        int runs = 0;
-        for (int i = index; i < arr.length + index; i++) {
-            if (arr[i % arr.length] > arr[(i + 1) % arr.length]) {
-                runs++;
-            }
-        }
-
-        return runs;
-    }
-
-    private static int countEquals(int[] arr) {
-        int eqs = 0;
-        for (int i = eqs; i < arr.length + eqs; i++) {
-            if (arr[i % arr.length] == arr[(i + 1) % arr.length]) {
-                eqs++;
-            }
-        }
-
-        return eqs;
-    }
-
-    private static int sumArr(int[] arr) {
-        int sum = 0;
-        for (int el : arr) {
-            sum += el;
-        }
-        return sum;
-    }
 }

@@ -39,9 +39,9 @@ public class MultipleHuffman {
             }
 
             // Print
-            String s = String.format("initial group %d, [%d .. %d], has %d syms (%4.1f%%)",
-                i, low, high, frequencyTreeCounter, (100.0 * (float) frequencyTreeCounter) / (float) (inArr.length));
-            System.out.println(s);
+            //String s = String.format("initial group %d, [%d .. %d], has %d syms (%4.1f%%)",
+            //    i, low, high, frequencyTreeCounter, (100.0 * (float) frequencyTreeCounter) / (float) (inArr.length));
+            //System.out.println(s);
 
             // Set code lengths for the interval. 0 if in interval, 15 otherwise.
             for (int j = 0; j <= CHAR_MAX; j++) {

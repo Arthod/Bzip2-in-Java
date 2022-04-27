@@ -71,7 +71,7 @@ public class BWT {
             count[k]--;
         }
 
-        
+        /*
         // Test V array is sorted by first two chars
         for (int i = 0; i < V.length - 2; i++) {
             int c = V[i];
@@ -84,7 +84,7 @@ public class BWT {
                     System.out.println("Fail");
                 }
             }
-        }
+        }*/
 
         // Q5
         int amountComparedEqualTotal = 0;  // number of characters that have been compared equal
@@ -111,7 +111,7 @@ public class BWT {
                 }
             }
         }
-        
+        /*
         // Test V array is sorted
         for (int i = 0; i < V.length - 2; i++) {
             int c = V[i];
@@ -127,7 +127,7 @@ public class BWT {
                 }
                 System.out.println();
             }
-        }
+        }*/
         
         // Now our V has the correctly sorted indicies of the square
         // Now we fetch the last column of the BWT square
