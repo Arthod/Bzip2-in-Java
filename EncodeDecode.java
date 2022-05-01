@@ -13,7 +13,7 @@ import java.util.Random;
 //      happens when I use arrays.
 
 class EncodeDecode {
-    private static int TREES_IMPROVE_ITER = 3; // Amount of times to improve the huffman trees, default 3
+    private static int TREES_IMPROVE_ITER = 5; // Amount of times to improve the huffman trees, default 3
     private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
     private static int BLOCK_SIZE = 50; // Bytes block size, default 50
     private static Boolean RLE = true;
@@ -43,11 +43,13 @@ class EncodeDecode {
         } else {
             //System.out.println("Read no flags");
         }
-        //System.out.println("Input: " + inFileName);
-        //System.out.println("Trees Improve Iter: " + TREES_IMPROVE_ITER);
-        //System.out.println("Trees Count: " + TREES_COUNT);
-        //System.out.println("Block Size: " + BLOCK_SIZE);
-        //System.out.println("RLE: " + RLE);
+        if (DEBUG_LEVEL >= 1) {
+            System.out.println("Input: " + inFileName);
+            System.out.println("Trees Improve Iter: " + TREES_IMPROVE_ITER);
+            System.out.println("Trees Count: " + TREES_COUNT);
+            System.out.println("Block Size: " + BLOCK_SIZE);
+            System.out.println("RLE: " + RLE);
+        }
 
 
         // Read raw file
@@ -55,45 +57,43 @@ class EncodeDecode {
         int[] rowId = new int[1];
 
         // Compress raw file
-        int[] tempArr = compress(inArr, rowId);
-
-        System.out.println(tempArr.length);
-        /*
+        int[] arr = compress(inArr, rowId);
+        
+        
+        
         String encodedFileName = "encoded.txt";
         String outFileName = "decoded.txt";
         if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
 
-        // Write encoded file
-        writeToFile(encodedFileName, tempArr);
-
-        // Re-read encoded file
-        tempArr = readFile(encodedFileName);
+        // Write encoded file and read encoded file
+        writeToFile(encodedFileName, arr);
+        arr = readFile(encodedFileName);
 
         // Decompres encoded file
-        tempArr = decompress(tempArr, rowId);
+        arr = decompress(arr, rowId);
         
         // Write decompressed file
-        writeToFile(outFileName, tempArr);
+        writeToFile(outFileName, arr);
 
         // Check for errors        
-        if (!isEqual(tempArr, inArr)) {
+        if (!isEqual(arr, inArr)) {
             System.out.println("ERROR, NOT EQUAL");
             return;
-        }*/
+        }
 	}
 
     private static int[] compress(int[] arr, int[] rowId) throws IOException {
         // Compression
         if (DEBUG_LEVEL >= 1) System.out.println("Burrows-Wheeler transform");
-        int[] tempArr = BWT.transform(arr, rowId);
+        arr = BWT.transform(arr, rowId);
 
         if (DEBUG_LEVEL >= 1) System.out.println("MoveToFront & Run-Length encoding");
-        tempArr = MoveToFront.encode(tempArr, RLE);
+        arr = MoveToFront.encode(arr, RLE);
 
         if (DEBUG_LEVEL >= 1) System.out.println("Multiple Huffman encoding");
-        tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        arr = MultipleHuffman.encode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
         
-        return tempArr;
+        return arr;
     }
     private static int[] decompress(int[] arr, int[] rowId) throws IOException {
         // Decompression
@@ -117,10 +117,8 @@ class EncodeDecode {
         int[] arr = new int[bytesAmount];
         
         // Iterate through all bytes in file and write to array
-        int byteRead = 0;
-        int k = 0;
-        while ((byteRead = inFile.read()) != -1) {
-            arr[k++] = byteRead;
+        for (int i = 0; i < bytesAmount; i++) {
+            arr[i] = inFile.read();
         }
         inFile.close();
 
