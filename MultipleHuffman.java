@@ -9,7 +9,7 @@ public class MultipleHuffman {
     private static int CODE_LENGTH_MIN = 0;
 
 
-    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE) throws IOException {
+    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE, boolean showSelectorFrequencies) throws IOException {
         // Count frequency of each character in the text
         int[] frequency = new int[CHAR_MAX + 1];
         for (int i = 0; i < inArr.length; i++) {
@@ -41,7 +41,7 @@ public class MultipleHuffman {
             // Print
             String s = String.format("initial group %d, [%d .. %d], has %d syms (%4.1f%%)",
                 i, low, high, frequencyTreeCounter, (100.0 * (float) frequencyTreeCounter) / (float) (inArr.length));
-            System.out.println(s);
+            //System.out.println(s);
 
             // Set code lengths for the interval. 0 if in interval, 15 otherwise.
             for (int j = 0; j <= CHAR_MAX; j++) {
@@ -170,7 +170,13 @@ public class MultipleHuffman {
         for (int i = 0; i < selectors.length; i++) {
             selectorsFrequencies[selectors[i]]++;
         }
-        System.out.println("Selectors Frequencies: " + Arrays.toString(selectorsFrequencies));
+        if (showSelectorFrequencies) {
+            for (int i = 0; i < TREES_COUNT; i++) {
+                System.out.print(selectorsFrequencies[i] + " ");
+            }
+            //System.out.println("Selectors Frequencies: " + Arrays.toString(selectorsFrequencies));
+            System.out.println();
+        }
 
         // Close out bit stream
 		outBit.close();
