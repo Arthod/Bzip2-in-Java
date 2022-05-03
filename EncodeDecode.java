@@ -36,10 +36,10 @@ class EncodeDecode {
                 BLOCK_SIZE = Integer.parseInt(args[2]);
 
             } else if (flag.equals("-rle")) {
-                RLE = false;
+                RLE = Boolean.parseBoolean(args[2]);
 
             } else if (flag.equals("-ssf")) {
-                showSelectorFrequencies = true;
+                showSelectorFrequencies = Boolean.parseBoolean(args[2]);
 
             } else {
                 //System.out.println("Read no flags");
@@ -53,6 +53,7 @@ class EncodeDecode {
             System.out.println("Trees Count: " + TREES_COUNT);
             System.out.println("Block Size: " + BLOCK_SIZE);
             System.out.println("RLE: " + RLE);
+            System.out.println("SSF: " + showSelectorFrequencies);
         }
 
 
@@ -67,25 +68,25 @@ class EncodeDecode {
             System.out.println(arr.length);
         }
         
-        //String encodedFileName = "encoded.txt";
-        //String outFileName = "decoded.txt";
-        //if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
+        String encodedFileName = "encoded.txt";
+        String outFileName = "decoded.txt";
+        if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
 
         // Write encoded file and read encoded file
-        //writeToFile(encodedFileName, arr);
-        //arr = readFile(encodedFileName);
+        writeToFile(encodedFileName, arr);
+        arr = readFile(encodedFileName);
 
         // Decompres encoded file
-        //arr = decompress(arr, rowId);
+        arr = decompress(arr, rowId);
         
         // Write decompressed file
-        //writeToFile(outFileName, arr);
+        writeToFile(outFileName, arr);
 
         // Check for errors        
-        //if (!isEqual(arr, inArr)) {
-        //    System.out.println("ERROR, NOT EQUAL");
-        //    return;
-        //}
+        if (!isEqual(arr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL");
+            return;
+        }
 	}
 
     private static int[] compress(int[] arr, int[] rowId) throws IOException {
