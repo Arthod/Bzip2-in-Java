@@ -13,12 +13,13 @@ import java.util.Random;
 //      happens when I use arrays.
 
 class EncodeDecode {
-    private static int TREES_IMPROVE_ITER = 3; // Amount of times to improve the huffman trees, default 3
+    private static int TREES_IMPROVE_ITER = 6; // Amount of times to improve the huffman trees, default 3
     private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
     private static int BLOCK_SIZE = 50; // Bytes block size, default 50
     private static Boolean RLE = true;
     private static int DEBUG_LEVEL = 0; // 0..5
     private static Boolean showSelectorFrequencies = false;
+    private static Boolean randomizeHuffmanSelection = false;
 
 	public static void main(String[] args) throws Exception {
         // Args
@@ -40,6 +41,9 @@ class EncodeDecode {
 
             } else if (flag.equals("-ssf")) {
                 showSelectorFrequencies = true;
+
+            } else if (flag.equals("-rhs")) {
+                randomizeHuffmanSelection = true;
 
             } else {
                 //System.out.println("Read no flags");
@@ -67,25 +71,25 @@ class EncodeDecode {
             System.out.println(arr.length);
         }
         
-        //String encodedFileName = "encoded.txt";
-        //String outFileName = "decoded.txt";
-        //if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
+        String encodedFileName = "encoded.txt";
+        String outFileName = "decoded.txt";
+        if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
 
         // Write encoded file and read encoded file
-        //writeToFile(encodedFileName, arr);
-        //arr = readFile(encodedFileName);
+        writeToFile(encodedFileName, arr);
+        arr = readFile(encodedFileName);
 
         // Decompres encoded file
-        //arr = decompress(arr, rowId);
+        arr = decompress(arr, rowId);
         
         // Write decompressed file
-        //writeToFile(outFileName, arr);
+        writeToFile(outFileName, arr);
 
         // Check for errors        
-        //if (!isEqual(arr, inArr)) {
-        //    System.out.println("ERROR, NOT EQUAL");
-        //    return;
-        //}
+        if (!isEqual(arr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL");
+            return;
+        }
 	}
 
     private static int[] compress(int[] arr, int[] rowId) throws IOException {
@@ -97,7 +101,7 @@ class EncodeDecode {
         arr = MoveToFront.encode(arr, RLE);
 
         if (DEBUG_LEVEL >= 1) System.out.println("Multiple Huffman encoding");
-        arr = MultipleHuffman.encode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE, showSelectorFrequencies);
+        arr = MultipleHuffman.encode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE, showSelectorFrequencies, randomizeHuffmanSelection);
         
         return arr;
     }

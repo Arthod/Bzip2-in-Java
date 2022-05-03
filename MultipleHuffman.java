@@ -2,6 +2,7 @@
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 public class MultipleHuffman {
     private static int CHAR_MAX = 256;
@@ -9,7 +10,7 @@ public class MultipleHuffman {
     private static int CODE_LENGTH_MIN = 0;
 
 
-    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE, boolean showSelectorFrequencies) throws IOException {
+    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE, boolean showSelectorFrequencies, boolean randomizeHuffmanSelection) throws IOException {
         // Count frequency of each character in the text
         int[] frequency = new int[CHAR_MAX + 1];
         for (int i = 0; i < inArr.length; i++) {
@@ -63,45 +64,91 @@ public class MultipleHuffman {
         // Selectors table, which table per block_size, calculate cheapest tree
         int[] selectors = new int[(int) Math.ceil(inArr.length / (double) BLOCK_SIZE)];
         int[][] treeFrequencies = new int[TREES_COUNT][CHAR_MAX + 1];
+
         for (int i = 0; i < TREES_IMPROVE_ITER; i++) {
-            treeFrequencies = new int[TREES_COUNT][CHAR_MAX + 1];
             // Go through each block_size
             for (int blockCurrent = 0; blockCurrent < selectors.length; blockCurrent++) {
                 int treeCheapest = -1;
                 int treeCheapestCost = Integer.MAX_VALUE;
 
                 // Iterate through all trees
+                int[] treeCosts = new int[TREES_COUNT];
                 for (int j = 0; j < TREES_COUNT; j++) {
-                    int treeCost = 0;
-
                     // Get cost of this tree in this block
                     for (int k = 0; k < BLOCK_SIZE; k++) {
                         int idx = blockCurrent * BLOCK_SIZE + k;
                         if (idx == inArr.length)
                             break;
                         int byteRead = inArr[idx];
-                        treeCost += codeLengths[j][byteRead];
+                        treeCosts[j] += codeLengths[j][byteRead];
                     }
 
                     // If it is cheaper, set it for this selector
-                    if (treeCost < treeCheapestCost) {
+                    if (treeCosts[j] < treeCheapestCost) {
                         treeCheapest = j;
-                        treeCheapestCost = treeCost;
+                        treeCheapestCost = treeCosts[j];
                     }
                 }
 
-                // Set frequencies for the cheapest tree
+                // Set cheapest for this selector
+                double f = Math.random();
+                double culmutativePercent = 0;
+                for (int k = 0; k < TREES_COUNT; k++) {
+                    culmutativePercent += treeCosts[k] / Arrays.stream(treeCosts).sum();
+                    System.out.println(culmutativePercent);
+                    if (f < culmutativePercent) {
+                        selectors[blockCurrent] = treeCosts[k];
+                        break;
+                    }
+                }
+                //selectors[blockCurrent] = treeCheapest;
+            }
+
+            if (randomizeHuffmanSelection && i == 1) {
+                System.out.println("Randomizing huffman selection");
+                int switchesTotal = 0;
+                for (int l = 0; l < 1; l++) {
+                    // Go through selectors array, redistribute most selected huffman tree
+                    // Selector frequency
+                    int[] selectorsFrequencies = new int[TREES_COUNT];
+                    for (int j = 0; j < selectors.length; j++) {
+                        selectorsFrequencies[selectors[j]]++;
+                    }
+                    // For each selector, random selection weight according to inverse of frequencies
+                    for (int j = 0; j < selectors.length; j++) {
+                        if (Math.random() < selectorsFrequencies[selectors[j]] / (double) selectors.length) {
+
+
+                            // Select a random to set this selector to
+                            double f = Math.random();
+                            double culmutativePercent = 0;
+                            for (int k = 0; k < TREES_COUNT; k++) {
+                                culmutativePercent += selectorsFrequencies[k] / (double) selectors.length;
+                                if (f < culmutativePercent) {
+                                    selectorsFrequencies[selectors[j]]--;
+                                    selectorsFrequencies[k]++;
+                                    selectors[j] = k;
+                                    switchesTotal++;
+                                    break;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                System.out.println("Switched: " + switchesTotal + " out of " + selectors.length);
+            }
+
+            // Set frequencies for the cheapest tree
+            treeFrequencies = new int[TREES_COUNT][CHAR_MAX + 1];
+            for (int blockCurrent = 0; blockCurrent < selectors.length; blockCurrent++) {
                 for (int k = 0; k < BLOCK_SIZE; k++) {
                     int idx = blockCurrent * BLOCK_SIZE + k;
                     if (idx == inArr.length)
                         break;
                     int byteRead = inArr[idx];
-                    treeFrequencies[treeCheapest][byteRead]++;
+                    treeFrequencies[selectors[blockCurrent]][byteRead]++;
                 }
-
-                // Set cheapest for this selector
-                selectors[blockCurrent] = treeCheapest;
-
             }
 
             // Now we have new frequencies (and selectors)
