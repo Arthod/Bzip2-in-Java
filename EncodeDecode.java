@@ -14,7 +14,7 @@ import java.util.Random;
 
 class EncodeDecode {
     private static int TREES_IMPROVE_ITER = 3; // Amount of times to improve the huffman trees, default 3
-    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
+    private static int TREES_COUNT = 2; // Amount of huffman trees, default 6
     private static int BLOCK_SIZE = 50; // Bytes block size, default 50
     private static Boolean RLE = true;
     private static int DEBUG_LEVEL = 0; // 0..5
@@ -130,9 +130,10 @@ class EncodeDecode {
         tempArr = MoveToFront.decode(tempArr, RLE);
         tempArr = BWT.reverseTransform(tempArr, rowId[0]);
         if (!isEqual(tempArr, inArr)) {
-            System.out.println("ERROR, NOT EQUAL mtf not working");
+            System.out.println("ERROR, NOT EQUAL huff not working");
             return;
         }
+        writeToFile("out.txt", tempArr);
 
         System.out.println("All working");
     }

@@ -257,6 +257,7 @@ public class MultipleHuffman {
     
     public static int[] decode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE) throws IOException {
         // Bit input
+        System.out.println("DECODING");
         IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
         BitInputStream inBit = new BitInputStream(inArrayStream);
         ArrayList<Integer> outList = new ArrayList<Integer>();
@@ -371,6 +372,7 @@ public class MultipleHuffman {
                     if (nextBit == -1) break;
                     readBits = readBits + nextBit;
                 }
+                
                 if (nextBit == -1) break;
                 outList.add(treeCodesToVal.get(treeSelected).get(readBits));
                 readBits = "";
