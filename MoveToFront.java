@@ -53,9 +53,7 @@ public class MoveToFront {
         int[] outArr = new int[inArr.length];
 
         // Reset array
-        for (int i = 0; i < 256; i++) {
-            recentlyUsedSymbols[i] = i;
-        }
+        resetRecentlyUsedSymbolsArray();
         
         // Read inArr array char by char, find the index and insert it into the outArr array
 		int byteRead;
@@ -121,9 +119,7 @@ public class MoveToFront {
         ArrayList<Integer> outList = new ArrayList<Integer>(inArr.length);
 
         // Reset array
-        for (int i = 0; i < 256; i++) {
-            recentlyUsedSymbols[i] = i;
-        }
+        resetRecentlyUsedSymbolsArray();
         
         // Read inArr array char by char, find the index and insert it into the outArr array
 		int byteRead;
@@ -176,5 +172,31 @@ public class MoveToFront {
         }
 
         return outList.stream().mapToInt(i -> i).toArray(); // clean up
+    }
+
+    private static void resetRecentlyUsedSymbolsArray() {
+        int i = 0;
+
+        // Common dictionary: https://en.wikipedia.org/wiki/Move-to-front_transform
+        // Lowercase
+        for (int c = 96; c <= 127; c++) {
+            recentlyUsedSymbols[i++] = c;
+        }
+        // Uppercase
+        for (int c = 64; c <= 95; c++) {
+            recentlyUsedSymbols[i++] = c;
+        }
+        // Punctuation / number
+        for (int c = 32; c <= 63; c++) {
+            recentlyUsedSymbols[i++] = c;
+        }
+        for (int c = 0; c <= 31; c++) {
+            recentlyUsedSymbols[i++] = c;
+        }
+
+        // Other non-ascii numbers
+        for (int c = 128; c < 256; c++) {
+            recentlyUsedSymbols[i++] = c;
+        }
     }
 }

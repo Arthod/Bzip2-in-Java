@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Huffman {
+    private static int CHAR_MAX = 256;
+
     public static int[] encode(int[] inArr) throws IOException {
 		// Bit output
 		IntArrayOutputStream outArrayStream = new IntArrayOutputStream(inArr.length);
 		BitOutputStream outBit = new BitOutputStream(outArrayStream);
 
 		// Reading input array
-        int[] frequency = new int[258];
+        int[] frequency = new int[CHAR_MAX + 1];
         for (int i = 0; i < inArr.length; i++) {
             frequency[inArr[i]]++;
         }
@@ -47,7 +49,7 @@ public class Huffman {
 
         // Read and sum the frequencies from file
         int sum = 0;
-        int[] frequency = new int[258];
+        int[] frequency = new int[CHAR_MAX + 1];
         for (int i = 0; i < frequency.length; i++) {
             frequency[i] = inBit.readInt();
             sum += frequency[i];
@@ -119,9 +121,59 @@ public class Huffman {
 		}
 	}
     public static String[] generateCode(Element root) {
-        String[] codes = new String[258];
+        String[] codes = new String[CHAR_MAX + 1];
 		generateCode(root, codes, "");
 
         return codes;
     }
+
+    public static String[] generateCodesFromBitLengths(int[] codeLengths) {
+        int minLength = 1000;
+        int maxLength = 0;
+
+        // Get min and max code lengths
+        for (int i = 0; i < codeLengths.length; i++) {
+            int codeLength = codeLengths[i];
+            
+            if (codeLength < minLength) {
+                minLength = codeLength;
+            }
+            if (codeLength > maxLength) {
+                maxLength = codeLength;
+            }
+        }
+
+        // Codes int
+        int code = 0;
+        String[] codes = new String[codeLengths.length];
+        for (int len = minLength; len <= maxLength; len++) {
+            for (int c = 0; c <= CHAR_MAX; c++) {
+                if (len == codeLengths[c]) {
+                    codes[c] = Integer.toBinaryString(code);
+                    code++;
+                }
+            }
+            code = code << 1;
+        }
+
+        // Return
+        return codes;
+    }
+
+    /*
+     * 
+	public static Element huffmanTreeFromCodeLengths(int[] codeLengths) {
+		int l = codeLengths.length;
+		PQHeap pq = new PQHeap();
+		for (int i = 0; i < l; i++) {
+			pq.insert(new Element(frequency[i], i));
+		}
+		for (int i = 0; i < l-1; i++) {
+			Element left = pq.extractMin();
+			Element right = pq.extractMin();
+			pq.insert(new Element(left.getKey() + right.getKey(), new Node(left, right)));
+		}
+		return pq.extractMin();
+	}
+    */
 }
