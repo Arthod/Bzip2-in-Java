@@ -56,38 +56,87 @@ class EncodeDecode {
             System.out.println("SSF: " + showSelectorFrequencies);
         }
 
+        if (true) {
+            testCorrectnessSteps(inFileName);
+            return;
+        } else {
 
+
+            // Read raw file
+            int[] inArr = readFile(inFileName);
+            int[] rowId = new int[1];
+
+            // Compress raw file
+            int[] arr = compress(inArr, rowId);
+            
+            if (!showSelectorFrequencies) {
+                System.out.println(arr.length);
+            }
+            
+            String encodedFileName = "encoded.txt";
+            String outFileName = "decoded.txt";
+            if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
+
+            // Write encoded file and read encoded file
+            writeToFile(encodedFileName, arr);
+            arr = readFile(encodedFileName);
+
+            // Decompres encoded file
+            arr = decompress(arr, rowId);
+            
+            // Write decompressed file
+            writeToFile(outFileName, arr);
+
+            // Check for errors        
+            if (!isEqual(arr, inArr)) {
+                System.out.println("ERROR, NOT EQUAL");
+                return;
+            }
+        }
+	}
+
+    private static void testCorrectnessSteps(String inFileName) throws Exception {
+        System.out.println("Testing correctness all");
         // Read raw file
         int[] inArr = readFile(inFileName);
         int[] rowId = new int[1];
+        int[] tempArr = inArr.clone();
 
-        // Compress raw file
-        int[] arr = compress(inArr, rowId);
-        
-        if (!showSelectorFrequencies) {
-            System.out.println(arr.length);
-        }
-        
-        String encodedFileName = "encoded.txt";
-        String outFileName = "decoded.txt";
-        if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
-
-        // Write encoded file and read encoded file
-        writeToFile(encodedFileName, arr);
-        arr = readFile(encodedFileName);
-
-        // Decompres encoded file
-        arr = decompress(arr, rowId);
-        
-        // Write decompressed file
-        writeToFile(outFileName, arr);
-
-        // Check for errors        
-        if (!isEqual(arr, inArr)) {
-            System.out.println("ERROR, NOT EQUAL");
+        // Test BWT
+        tempArr = BWT.transform(tempArr, rowId);
+        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        if (!isEqual(tempArr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL bwt not working");
             return;
         }
-	}
+
+        tempArr = BWT.transform(tempArr, rowId);
+        tempArr = MoveToFront.encode(tempArr, RLE);
+        tempArr = MoveToFront.decode(tempArr, RLE);
+        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        if (!isEqual(tempArr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL mtf not working");
+            return;
+        }
+
+        tempArr = BWT.transform(tempArr, rowId);
+        tempArr = MoveToFront.encode(tempArr, RLE);
+        tempArr = MultipleHuffman.encode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE, showSelectorFrequencies);
+        
+        writeToFile("TESTDELETEME.txt", tempArr);
+        tempArr = readFile("TESTDELETEME.txt");
+        
+        tempArr = MultipleHuffman.decode(tempArr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        tempArr = MoveToFront.decode(tempArr, RLE);
+        tempArr = BWT.reverseTransform(tempArr, rowId[0]);
+        if (!isEqual(tempArr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL mtf not working");
+            return;
+        }
+
+        System.out.println("All working");
+    }
+
 
     private static int[] compress(int[] arr, int[] rowId) throws IOException {
         // Compression

@@ -127,7 +127,7 @@ public class Huffman {
         return codes;
     }
 
-    public static String[] generateCodesFromBitLengths(int[] codeLengths) {
+    public static String[] generateCodesFromLengths(int[] codeLengths) {
         int minLength = 1000;
         int maxLength = 0;
 
@@ -135,12 +135,8 @@ public class Huffman {
         for (int i = 0; i < codeLengths.length; i++) {
             int codeLength = codeLengths[i];
             
-            if (codeLength < minLength) {
-                minLength = codeLength;
-            }
-            if (codeLength > maxLength) {
-                maxLength = codeLength;
-            }
+            minLength = Math.min(codeLength, minLength);
+            maxLength = Math.max(codeLength, maxLength);
         }
 
         // Codes int
@@ -149,7 +145,8 @@ public class Huffman {
         for (int len = minLength; len <= maxLength; len++) {
             for (int c = 0; c <= CHAR_MAX; c++) {
                 if (len == codeLengths[c]) {
-                    codes[c] = Integer.toBinaryString(code);
+                    codes[c] = String.format("%" + codeLengths[c] + "s", Integer.toBinaryString(code))
+                        .replace(' ', '0');
                     code++;
                 }
             }
@@ -159,21 +156,4 @@ public class Huffman {
         // Return
         return codes;
     }
-
-    /*
-     * 
-	public static Element huffmanTreeFromCodeLengths(int[] codeLengths) {
-		int l = codeLengths.length;
-		PQHeap pq = new PQHeap();
-		for (int i = 0; i < l; i++) {
-			pq.insert(new Element(frequency[i], i));
-		}
-		for (int i = 0; i < l-1; i++) {
-			Element left = pq.extractMin();
-			Element right = pq.extractMin();
-			pq.insert(new Element(left.getKey() + right.getKey(), new Node(left, right)));
-		}
-		return pq.extractMin();
-	}
-    */
 }
