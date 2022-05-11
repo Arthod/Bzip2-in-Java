@@ -114,6 +114,7 @@ public class MultipleHuffman {
                 codeLengths[j] = generateCodeLengths(root);
             }
         }
+        System.out.println(Arrays.toString(codeLengths[0]));
 
 		// Bit output
 		IntArrayOutputStream outArrayStream = new IntArrayOutputStream(inArr.length);
@@ -203,6 +204,7 @@ public class MultipleHuffman {
         for (int i = 0; i < TREES_COUNT; i++) {
             treeCodes[i] = Huffman.generateCodesFromLengths(codeLengths[i]);
         }
+        System.out.println(Arrays.toString(treeCodes[0]));
 
         // if trees amount is 6, we need 3 bits to represent. 001, 010, 011, etc.
         int bitsNeeded = (int) Math.ceil(Math.log(TREES_COUNT) / Math.log(2));

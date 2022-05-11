@@ -56,7 +56,7 @@ class EncodeDecode {
             System.out.println("SSF: " + showSelectorFrequencies);
         }
 
-        if (true) {
+        if (false) {
             testCorrectnessSteps(inFileName);
             return;
         } else {

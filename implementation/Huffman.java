@@ -94,11 +94,15 @@ public class Huffman {
 	 */
 	public static Element huffmanTree(int[] frequency) {
 		int l = frequency.length;
+        int nodesCount = 0;
 		PQHeap pq = new PQHeap();
 		for (int i = 0; i < l; i++) {
-			pq.insert(new Element(frequency[i], i));
+            if (frequency[i] > 0) {
+                nodesCount++;
+			    pq.insert(new Element(frequency[i], i));
+            }
 		}
-		for (int i = 0; i < l-1; i++) {
+		for (int i = 0; i < nodesCount - 1; i++) {
 			Element left = pq.extractMin();
 			Element right = pq.extractMin();
 			pq.insert(new Element(left.getKey() + right.getKey(), new Node(left, right)));
@@ -135,7 +139,7 @@ public class Huffman {
         for (int i = 0; i < codeLengths.length; i++) {
             int codeLength = codeLengths[i];
             
-            minLength = Math.min(codeLength, minLength);
+            minLength = Math.max(Math.min(codeLength, minLength), 1);
             maxLength = Math.max(codeLength, maxLength);
         }
 
