@@ -3,7 +3,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class MoveToFront {
-    private static int[] recentlyUsedSymbols = new int[256];
+    private static int CHAR_MAX = 255;
+    private static int[] recentlyUsedSymbols = new int[CHAR_MAX + 1];
     private static int runA = 0;
     private static int runB = 1;
     private static int offset = 0;
@@ -106,10 +107,11 @@ public class MoveToFront {
         }
 
         // Cut array
-        int[] outArr2 = new int[inArr.length - offset];
-        for (int i = 0; i < outArr2.length; i++) {
+        int[] outArr2 = new int[inArr.length - offset + 1];
+        for (int i = 0; i < outArr2.length - 1; i++) {
             outArr2[i] = outArr[i];
         }
+        outArr2[outArr2.length - 1] = CHAR_MAX + 2; // EOF char
         
         return outArr2;
     }

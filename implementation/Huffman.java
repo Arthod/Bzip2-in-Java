@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Huffman {
-    private static int CHAR_MAX = 256;
+    private static int CHAR_MAX = 257;
 
     public static int[] encode(int[] inArr) throws IOException {
 		// Bit output

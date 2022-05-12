@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MultipleHuffman {
-    private static int CHAR_MAX = 256;
+    private static int CHAR_MAX = 257;  // 0 = runA, 1 = runB, 2 = 1, 3 = 2, ..., 256 = 255, 257 = EOF
     private static int CODE_LENGTH_MAX = 15;    // Initial max code length, default 15
     private static int CODE_LENGTH_MIN = 0;
 
@@ -114,7 +114,6 @@ public class MultipleHuffman {
                 codeLengths[j] = generateCodeLengths(root);
             }
         }
-        System.out.println(Arrays.toString(codeLengths[0]));
 
 		// Bit output
 		IntArrayOutputStream outArrayStream = new IntArrayOutputStream(inArr.length);
@@ -125,13 +124,13 @@ public class MultipleHuffman {
         for (int i = 0; i < TREES_COUNT; i++) {
             // TODO is it 16 x 16?? or 16 x 16 + (1 or 2)
             boolean[] symMapLevel1 = new boolean[16];
-            boolean[] symMapLevel2 = new boolean[CHAR_MAX + 1];
+            boolean[] symMapLevel2 = new boolean[CHAR_MAX - 1];
 
             // Write symmap level 1
             for (int j = 0; j < 16; j++) {
                 boolean writeZeroBit = true;
                 for (int k = 0; k < 16; k++) {
-                    int idx = j * 16 + k;
+                    int idx = j * 16 + k + 2;
                     
                     if (treeFrequencies[i][idx] > 0) {
                         outBit.writeBit(1);
@@ -150,7 +149,7 @@ public class MultipleHuffman {
                 if (symMapLevel1[j]) {
                     for (int k = 0; k < 16; k++) {
                         int idx = j * 16 + k;
-                        if (treeFrequencies[i][idx] > 0) {
+                        if (treeFrequencies[i][idx + 2] > 0) {
                             outBit.writeBit(1);
                             symMapLevel2[idx] = true;
                         } else {
@@ -170,14 +169,29 @@ public class MultipleHuffman {
                 else            outBit.writeBit(1);
             }
             
+            // runB is assumed to be there
+            int diff = bitLength - codeLengths[i][1];
+
+            if (diff == 0) {
+                outBit.writeBit(0);
+            } else {
+                outBit.writeBit(1);
+                bitLength = bitLength - diff;
+                if (diff > 0) { // Need to increment value
+                    outBit.writeBit(1);
+                } else {
+                    outBit.writeBit(0);
+                }
+                for (int k = 0; k < Math.abs(diff) - 1; k++) {
+                    outBit.writeBit(1);
+                }
+                outBit.writeBit(0);
+            }   
             // Delta encode starting with char 1 from initial bit length.
-            // 0 for same length, 110 for -1, 100 for +1, 1010 for +2, 1110 for -2, etc.
-            assert symMapLevel1[0] == true;
-            assert symMapLevel2[0] == true;
-            
-            for (int j = 1; j < codeLengths[i].length; j++) {
-                if (symMapLevel2[j]) {
-                    int diff = bitLength - codeLengths[i][j];
+            // 0 for same length, 110 for -1, 100 for +1, 1010 for +2, 1110 for -2, etc.         
+            for (int j = 2; j < codeLengths[i].length; j++) {
+                if (symMapLevel2[j - 2]) {
+                    diff = bitLength - codeLengths[i][j];
 
                     if (diff == 0) {
                         outBit.writeBit(0);
@@ -204,7 +218,6 @@ public class MultipleHuffman {
         for (int i = 0; i < TREES_COUNT; i++) {
             treeCodes[i] = Huffman.generateCodesFromLengths(codeLengths[i]);
         }
-        System.out.println(Arrays.toString(treeCodes[0]));
 
         // if trees amount is 6, we need 3 bits to represent. 001, 010, 011, etc.
         int bitsNeeded = (int) Math.ceil(Math.log(TREES_COUNT) / Math.log(2));
@@ -259,7 +272,6 @@ public class MultipleHuffman {
     
     public static int[] decode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE) throws IOException {
         // Bit input
-        System.out.println("DECODING");
         IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
         BitInputStream inBit = new BitInputStream(inArrayStream);
         ArrayList<Integer> outList = new ArrayList<Integer>();
@@ -274,7 +286,7 @@ public class MultipleHuffman {
             }
 
             // Read symmap level2, is 16 bits for each true in symMapLevel1
-            boolean[] symMapLevel2 = new boolean[CHAR_MAX + 1];
+            boolean[] symMapLevel2 = new boolean[CHAR_MAX - 1];
             for (int j = 0; j < 16; j++) {
                 if (symMapLevel1[j]) {
                     for (int k = 0; k < 16; k++) {
@@ -295,10 +307,33 @@ public class MultipleHuffman {
             int codeLength = Integer.parseInt(codeLengthStr, 2);
             codeLengths[i][0] = codeLength;
             codeLengthMax = Math.max(codeLengthMax, codeLength);
+            // If readBit is zero, we stay same code length
+            if (inBit.readBit() == 0) {
+                codeLengths[i][1] = codeLength;
+            } else {
+                // Read next bit, if 1 then negative, 0 then positive
+                int diffSign = inBit.readBit();
+                int count = 1;
+
+                // Continue reading (unary encoded) until we read a zero
+                while (inBit.readBit() == 1) {
+                    count++;
+                }
+
+                // Increment/decrement code length according to this delta
+                if (diffSign == 1)
+                    codeLength -= count;
+                else
+                    codeLength += count;
+
+                // Set
+                codeLengths[i][1] = codeLength;
+                codeLengthMax = Math.max(codeLengthMax, codeLength);
+            }
 
             // Read delta encoded code lengths
-            for (int j = 1; j < codeLengths[i].length; j++) {
-                if (symMapLevel2[j]) {
+            for (int j = 2; j < codeLengths[i].length; j++) {
+                if (symMapLevel2[j - 2]) {
                     // If readBit is zero, we stay same code length
                     if (inBit.readBit() == 0) {
                         codeLengths[i][j] = codeLength;
@@ -322,13 +357,6 @@ public class MultipleHuffman {
                         codeLengths[i][j] = codeLength;
                         codeLengthMax = Math.max(codeLengthMax, codeLength);
                     }
-                }
-            }
-
-            // NOT ZERO
-            for (int j = 1; j < codeLengths[i].length; j++) {
-                if (codeLengths[i][j] == 0) {
-                    codeLengths[i][j] = codeLengthMax + 1;
                 }
             }
         }
@@ -368,6 +396,8 @@ public class MultipleHuffman {
 
             String readBits = "";
             int charsRead = 0;
+            int byteRead = -1;
+
             while (charsRead < BLOCK_SIZE) {
                 while (!treeCodesToVal.get(treeSelected).containsKey(readBits)) {
                     nextBit = inBit.readBit();
@@ -376,9 +406,17 @@ public class MultipleHuffman {
                 }
                 
                 if (nextBit == -1) break;
-                outList.add(treeCodesToVal.get(treeSelected).get(readBits));
+                byteRead = treeCodesToVal.get(treeSelected).get(readBits);
+                if (byteRead == 257) {
+                    break;
+                } else {
+                    outList.add(byteRead);
+                }
                 readBits = "";
                 charsRead++;
+            }                
+            if (byteRead == 257) {
+                break;
             }
         }
         

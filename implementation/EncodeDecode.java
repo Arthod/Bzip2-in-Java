@@ -14,7 +14,7 @@ import java.util.Random;
 
 class EncodeDecode {
     private static int TREES_IMPROVE_ITER = 3; // Amount of times to improve the huffman trees, default 3
-    private static int TREES_COUNT = 2; // Amount of huffman trees, default 6
+    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
     private static int BLOCK_SIZE = 50; // Bytes block size, default 50
     private static Boolean RLE = true;
     private static int DEBUG_LEVEL = 0; // 0..5
@@ -56,43 +56,39 @@ class EncodeDecode {
             System.out.println("SSF: " + showSelectorFrequencies);
         }
 
-        if (false) {
-            testCorrectnessSteps(inFileName);
-            return;
-        } else {
+        // Read raw file
+        int[] inArr = readFile(inFileName);
+        int[] rowId = new int[1];
 
-
-            // Read raw file
-            int[] inArr = readFile(inFileName);
-            int[] rowId = new int[1];
-
-            // Compress raw file
-            int[] arr = compress(inArr, rowId);
-            
-            if (!showSelectorFrequencies) {
-                System.out.println(arr.length);
-            }
-            
-            String encodedFileName = "encoded.txt";
-            String outFileName = "decoded.txt";
-            if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
-
-            // Write encoded file and read encoded file
-            writeToFile(encodedFileName, arr);
-            arr = readFile(encodedFileName);
-
-            // Decompres encoded file
-            arr = decompress(arr, rowId);
-            
-            // Write decompressed file
-            writeToFile(outFileName, arr);
-
-            // Check for errors        
-            if (!isEqual(arr, inArr)) {
-                System.out.println("ERROR, NOT EQUAL");
-                return;
-            }
+        // Compress raw file
+        int[] arr = compress(inArr, rowId);
+        
+        if (!showSelectorFrequencies) {
+            System.out.println(arr.length);
         }
+        
+        /*
+        String encodedFileName = "encoded.txt";
+        String outFileName = "decoded.txt";
+        if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
+
+        // Write encoded file and read encoded file
+        writeToFile(encodedFileName, arr);
+        arr = readFile(encodedFileName);
+
+        // Decompres encoded file
+        arr = decompress(arr, rowId);
+        
+        // Write decompressed file
+        writeToFile(outFileName, arr);
+
+        // Check for errors
+        if (!isEqual(arr, inArr)) {
+            System.out.println("ERROR, NOT EQUAL");
+            return;
+        }*/
+        
+        
 	}
 
     private static void testCorrectnessSteps(String inFileName) throws Exception {
