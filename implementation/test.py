@@ -37,8 +37,8 @@ outfile.write(";".join([str(a) for a in xx]) + "\n")
 outfile.write(";".join([str(a) for a in yy]) + "\n")
 outfile.flush()
 os.fsync(outfile.fileno())
-    
-"""
+
+
 # SSF
 print("SSF")
 outfile.write("SSF" + "\n")
@@ -73,7 +73,6 @@ for i in [30, 50, 100, 200, 300, 500, 1000, 2000]:
     outfile.write(";".join([str(a) for a in ([i] + yy)]) + "\n")
     outfile.flush()
     os.fsync(outfile.fileno())
-"""
 
 # Trees improve iter
 print("Trees improve iter")
