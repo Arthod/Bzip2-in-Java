@@ -4,6 +4,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{biblatex} %Imports biblatex package
+\usepackage[dvipsnames]{xcolor}
+\usepackage{caption}
+\usepackage{float}
+
+
 \addbibresource{biblo.bib} %Import the bibliography file
 
 \title{bachelorproject}
@@ -16,8 +21,16 @@
 
 \begin{abstract}
 Test abstract
+
+\verb|asdqweasddddddddddddeq|
+
 \end{abstract}
 
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+\newpage
 \section{Introduction}
 \cite{einstein}
 \cite{burrows1994block}
@@ -32,18 +45,25 @@ Test abstract
 % There is a higher demand for storing data than ever before
 We are storing and transmitting more and more data every year and as our demand for storing and transmitting data increases so does our demand for better data compressors. % TODO, as our demand for data storage and data transmission ?
 % TODO: There is no maximum-data required peak in sight?.
-There are many advantages in being able to compress a message efficiently. Among these advantages is that we are able to better utilize the storage capacity for both short and long term data storage. This also has benefits in data transmission. By reducing the length of the message we intend to send, we reduce the amount of time needed to send it.
+There are many advantages to being able to compress a message efficiently. Among these advantages is that we are able to better utilize the storage capacity for both short and long term data storage. This also has benefits in data transmission. By reducing the length of the message we intend to send, we reduce the amount of time needed to send it.
 % TODO: Maybe something about compressing to search faster?
 % In that case, edit below: "..very clear economic AND SOCIAL incentives.."
 For these reasons there are very clear economic and technological incentives to research subjects relating to data compression and to continuously develop better techniques that serve this purpose.
-\newline
+\\
 Compressors work by inputting a file, processing it, and then outputting an encoded file. This encoded file is generally shorter than the input file, but contains enough information so that a decompressor is able regenerate the original file from the encoded file. Compressors are able to do this by removing redundant information in the data. % Er det her trivielt?
-Some compressors are developed to only compress certain specific types of data, for example being developed specifically to compress only image files or only DNA files. 
+Some compressors are developed to only compress certain specific types of data, for example being developed specifically to compress only image files or only DNA files.
 Other compressors are developed to be more general-purpose and are in many cases able to to compress a greater variety of different types of data.
-% Lossy vs lossless?
+There exists two types of compressio
+% Lossy vs lossless? - det skal med.
+% JPG, Mp3, lossy (meget bedre)
+% we want all data back after decompressing, bzip2 er kun champion i lossless
 When deciding which method to use for compression there are two major factors to consider: compression ratio and (de)compression speed. % This is why there are many different possible methods. Pareto frontier/efficiency
 For some purposes we might want to compress fast but still with relatively good ratio, while other times compression ratio may be the main focus. This speed vs ratio is a common trade-off, not only in compression.
 One program that is one of the champions of compression, and which has an excellent compression ratio in terms of its speed is \(bzip2\). % TODO, skal bzip2 være kursiv? 
+% Champion over, hvordan compares det? Existerende arbejde, hvordan klarer de andre algoritmer sig ift?
+% Referencer generelt mangler. Der skal være mindst 10 referencer.
+% Når jeg nævner lossy, 3 referencer etc.
+% If the reader is more curious, etc. (nok ikke så god ide i det her tilfælde)
 \\
 \(bzip2\) is a general-purpose and lossless compression program originally developed by Julian Seward and now maintained by Mark Wielaard and Micah Snyder. % TODO: Verify authors and current maintainers
 It combines several self-contained techniques and algorithms that are used in data compression, the core of which being the Burrows–Wheeler transform (BWT).
@@ -54,17 +74,18 @@ Where and how BZIP2 is known to perform very well
 \\
 In this project we wish to examine and justify the used techniques in \(bzip2\).........
 
-
-
-\section{Theory? (Faglig fremstilling)}
+\section{Coding Theory}
+% 
 \subsection{Entropy?}
 Shannon coding theorem \\
 Pidgeonhole principle on compressing
 
 
 \subsection{\(bzip2\) Resume}
-\(bzip2\) is an open-source file compression program. It is considered a powerful compressor, generally having a better compression ratio than the more commonly-used \(gzip\) and \(zip\), but having slower compression and decompression times.\footnote{https://tukaani.org/lzma/benchmarks.html}
-It is a general-purpose compressor that combines 5 self-contained layers of compression techniques, these layers are
+\texttt{bzip2} is an open-source file compression program. It is a general-purpose compressor that combines 5 self-contained layers of compression techniques, these layers are. 
+
+It is considered a powerful compressor, in general showing better results than the more commonly-used \texttt{gzip} and \texttt{zip} in terms of compression ratio, but worse in terms of de(compression) speed.
+
 \begin{enumerate}
 	\item Run-length encoding (RLE 1)
 	\item Burrows-Wheeler transform (BWT)
@@ -73,83 +94,65 @@ It is a general-purpose compressor that combines 5 self-contained layers of comp
 	\item Huffman encoding (using multiple Huffman trees).
 \end{enumerate}
 
-The core of \(bzip2\) is the Burrows-Wheeler transform. uses several methods, the core of which being the Burrows-Wheeler transform. The techniques used in \(bzip2\) are loosely based on the research article by burrows and wheeler % TODO: place this somewhere
+The core of \texttt{bzip2} is the Burrows-Wheeler transform. uses several methods, the core of which being the Burrows-Wheeler transform. The techniques used in \texttt{bzip2} are loosely based on the research article by burrows and wheeler % TODO: place this somewhere
 
-\subsection{}
+\section{The Algorithm of Burrows and Wheeler}
+In May 10. 1994, Michael Burrows and David J. Wheeler released a research report titled A Block-sorting Lossless Data Compression Algorithm. In this report they described a new and reversible data transform that had not previously been seen, which is now called the Burrows-Wheeler transform (BWT). This BWT transforms the data to another of near 1:1 size, where the new data is much more compressible.
+Using their new data transform they described a data compressor using 
+compression technique which takes advantage of a previously unseen transformation now known as the Burrows-Wheeler Transform or BWT for short.
+
 
 \subsection{Burrows-Wheeler Transform (BWT)}
-The Burrows-Wheeler transform (BWT) is the second technique used in the \(bzip2\) compressor. It is a vital step and lays the groundwork for the next a
-It is a reversible data transform that was invented by Michael Burrows and David Wheeler, and released in a research report in 1994. The transform is itself not a compressor but preprocesses data, preparing it for other compression algorithms. It takes a block of data \(S\) and outputs another block of data \(L\), and a number \(I\). 
+The Burrows-Wheeler transform (BWT) is the second technique used in the \texttt{bzip2} compressor. It is a data transform that creates a permutation of the the data, making it easier to compress while being near 1:1 reversible, requiring only one number as metadata, required to retrieve the original string. 
+This reversible transform was invented by Michael Burrows and David Wheeler, and released in a research report in 1994. The transform is itself not a compressor but preprocesses data, preparing it for other compression algorithms. It takes a block of data \(S\) and outputs another block of data \(L\) of same size, and a number \(I\). 
 Burrows and Wheeler showed how given \(L\) and \(I\), we can restore the original data \(S\). The output data \(L\) is a permutation of the input \(S\) but where identical characters are grouped more together. This grouping together of characters as we will show works very well with other algorithms for compressing the data.
 \subsubsection{Transform}
 % TODO, Transform slow, transform effective (using suffix arrays)
-Given a string \(S = "abracadabra"\), we wish to perform the BWT on it. We start by introducing a new character \(\$\) to \(S\) and appending it to the end of the string. \(\$\) is a character that does not previously appear in \(S\) and is lexicographically the smallest character. Thus we have \(S' = "abracadabra\$"\) % In the lexicographically sorted alphabet \Sigma = $abcd
+Given a string \(S = "abracadabra"\), we wish to perform the \texttt{BWT} on it. We start by introducing a new character \(\$\) to \(S\) and appending it to the end of the string. \(\$\) is a character that does not previously appear in \(S\) and is lexicographically the smallest character. Thus we have \(S' = "abracadabra\$"\) % In the lexicographically sorted alphabet \Sigma = $abcd
 We now generate all cyclic shifts of \(S'\) and sort them lexicographically.
-\iffalse
-    {\footnotesize \setlength{\jot}{1pt} % TODO
-     \begin{align*}
-        abracadabra\$ \\
-        bracadabra\$a \\
-        racadabra\$ab \\
-        acadabra\$abr \\
-        cadabra\$abra \\
-        adabra\$abrac \\
-        dabra\$abraca \\
-        abra\$abracad \\
-        bra\$abracada \\
-        ra\$abracadab \\
-        a\$abracadaba \\
-        \$abracadabaa
-    \end{align*}}
-\fi
-{ 
-\begin{equation*}
-    \begin{tabular}{|c|c|}
-    \hline
-    0 & abracadabra\$ \\ \hline
-    1 & bracadabra\$a \\ \hline
-    2 & racadabra\$ab \\ \hline
-    3 & acadabra\$abr \\ \hline
-    4 & cadabra\$abra \\ \hline
-    5 & adabra\$abrac \\ \hline
-    6 & dabra\$abraca \\ \hline
-    7 & abra\$abracad \\ \hline
-    8 & bra\$abracada \\ \hline
-    9 & ra\$abracadab \\ \hline
-    10 & a\$abracadabr \\ \hline
-    11 & \$abracadabra \\ \hline
-    \end{tabular}
-    \qquad \longrightarrow \qquad
-    \begin{tabular}{|c|c|}
-     \hline
-    %\quad\quad\quad\quad\quad \ L \\ \hline
-    11 & \$abracadabra \\ \hline
-    
-    10 & a\$abracadabr \\ \hline
-    7 & abra\$abracad \\ \hline
-    0 & abracadabra\$ \\ \hline
-    3 & acadabra\$abr \\ \hline
-    5 & adabra\$abrac \\ \hline
-    
-    8 & bra\$abracada \\ \hline
-    1 & bracadabra\$a \\ \hline
-    
-    4 & cadabra\$abra \\ \hline
-    
-    6 & dabra\$abraca \\ \hline
-    
-    9 & ra\$abracadab \\ \hline
-    2 & racadabra\$ab \\ \hline
-    \end{tabular}
-\end{equation*}
-}
-After lexicographically sorting the cyclic shifts (the matrix on the right), our output will be the last column. We will have our output \(L = "ard\$rcaaaabb"\) and \(I = 3\). \(L\) will be the last column of the sorted cyclic shifts and \(I\) is the row number of the original string in the sorted cyclic shifts matrix. 
-Since we have defined each row in the matrix to be a cyclic shift of our original string, then obviously, in the unsorted matrix each row and column is a cyclic shift of \(S'\). After sorting the rows of the matrix, the columns will no longer necessarily be the cyclic shifts of \(S'\) but they will still be permutations of it. 
-This algorithm provides a good conceptual way to imagine and explain the transform but is not used in practice since it requires constructing the entire matrix in memory, requiring \(O(n^2)\) space.
+
+\begin{figure}[H]
+    \[
+        \begin{tabular}{|c|c|}
+            \hline
+            0 & abracadabra\$ \\ \hline
+            1 & bracadabra\$a \\ \hline
+            2 & racadabra\$ab \\ \hline
+            3 & acadabra\$abr \\ \hline
+            4 & cadabra\$abra \\ \hline
+            5 & adabra\$abrac \\ \hline
+            6 & dabra\$abraca \\ \hline
+            7 & abra\$abracad \\ \hline
+            8 & bra\$abracada \\ \hline
+            9 & ra\$abracadab \\ \hline
+            10 & a\$abracadabr \\ \hline
+            11 & \$abracadabra \\ \hline
+        \end{tabular}
+        \qquad \longrightarrow \qquad
+        \begin{tabular}{|c|c|}
+            \hline
+            11 & \$abracadabra \\ \hline
+            10 & a\$abracadabr \\ \hline
+            7 & abra\$abracad \\ \hline
+            0 & abracadabra\$ \\ \hline
+            3 & acadabra\$abr \\ \hline
+            5 & adabra\$abrac \\ \hline
+            8 & bra\$abracada \\ \hline
+            1 & bracadabra\$a \\ \hline
+            4 & cadabra\$abra \\ \hline
+            6 & dabra\$abraca \\ \hline
+            9 & ra\$abracadab \\ \hline
+            2 & racadabra\$ab \\ \hline
+        \end{tabular}
+    \]
+    \captionof{figure}{The cyclic shifts of \(S'\) (left) sorted lexicographically (right). The output is then the last column of the sorted cyclic shifts matrix \(L = "ard\$rcaaaabb"\) and the row number of the original string \(S'\) in the sorted cyclic shifts matrix \(I = 3\).}
+\end{figure}
+Since we have defined each row in the matrix to be a cyclic shift of our original string, then obviously, in the unsorted matrix each row and column is a cyclic shift of \(S'\). After sorting the rows of the matrix, the rows remain cyclic shifts but the columns will no longer necessarily be the cyclic shifts of \(S'\) but they will remain a permutation of it. 
+This algorithm provides a good conceptual way to imagine and explain the \texttt{BWT} but is not used in practice since it requires constructing the entire matrix in memory, requiring \(O(n^2)\) space.
 \newline
 \newline
 Burrows and Wheeler observed that when we lexicographically sort the rows of the matrix, the order they end up in is the same order the suffixes are in, in the suffix array. This is the case since like the suffix array of \(S\), when we sort the cyclic shifts of \(S'\) we only need to sort up to and including the \(\$\) symbol.
-This means that the transform can be computed by constructing the suffix array
+This means that the transform can be computed by constructing the suffix array \(SA\) of \(S\)
 \begin{equation*}
     \begin{tabular}{|c|l|}
     \hline
@@ -187,7 +190,7 @@ This means that the transform can be computed by constructing the suffix array
     11 & 2 & racadabra\$ \\ \hline
     \end{tabular}
 \end{equation*}
-The BWT can then be constructed directly from the suffix array \(SA\) and our original string \(S\). We build the string \(L\) for each index \(i = 0 \dots |S|-1\):
+And then the \texttt{BWT} can then be constructed directly from the suffix array \(SA\) and our original string \(S\). We build the string \(L\) for each index \(i = 0 \dots |S|-1\):
 \[
     L[i] = \begin{cases} 
         S[SA[i] - 1] & SA[i] > 0 \\
@@ -195,7 +198,7 @@ The BWT can then be constructed directly from the suffix array \(SA\) and our or
    \end{cases}
 \]
 The character in \(L[i]\) will be the character one step left of the character at index \(SA[i]\), which is \(S[SA[i] - 1]\). When \(SA[i] = 0\) the character will be the special \(\$\) character. In the same example we will have the same string \(L = "ard\$rcaaaabb"\) and \(I = 3\).
-This reduces the problem of finding the BWT of \(S\) to the problem of constructing the suffix array of \(S\). After transforming using the BWT, we can omit \(\$\) in the output since we know the value of \(I\).
+This reduces the problem of finding the \texttt{BWT} of \(S\) to the problem of constructing the suffix array of \(S\). After transforming using the BWT, we can omit \(\$\) in the output since we know the value of \(I\).
 
 
 \subsubsection{Reverse Transform}
@@ -315,21 +318,13 @@ The original string \(S'\)
 This transformation is the core of \(bzip2\)
 
 \subsection{Move-to-front Encoding}
-The Move-to-Front Encoding (MTF) is the third algorithm used in the \(bzip2\) compressor. It is a reversible lossless encoder that, like the BWT, does not change the size of input. It takes advantage of the expected output of the BWT to further processes the data.
+The Move-to-Front Encoding (MTF) is the third algorithm used in the \texttt{bzip2} compressor. It is a reversible lossless encoder that, like the BWT, does not change the size of input. It takes advantage of the expected output of the \texttt{BWT} to further processes the data.
 
 \subsubsection{Encoding}
 The encoding process works by replacing each character by its index in a list containing the alphabet. Each time a character is read the list is updated, where that character is pushed to the front of the list.
-To encode using the MTF encoder we first initialize a list containing the alphabet. In this case we use our previous output from the BWT, the string \(L = "ardrcaaaabb"\). This is the string we wish to encode. We initialize a list containing the symbols appearing in \(L\) in alphabetical order.
+To encode using the \texttt{MTF} encoder we first initialize a list containing the alphabet. In this case we use our previous output from the BWT, the string \(L = "ardrcaaaabb"\). This is the string we wish to encode. We initialize a list that contains the unique symbols appearing in \(L\) sorted in alphabetical order.
 \begin{align*}
-    \begin{tabular}{ccccc}
-        0 & 1 & 2 & 3 & 4
-    \end{tabular}
-    \\
-    \begin{tabular}{|c|c|c|c|c|}
-        \hline
-        a & b & c & d & r \\
-        \hline
-    \end{tabular}
+    \Sigma = [a, b, c, d, r]
 \end{align*}
 Now we iterate through \(L\). For each character in \(L\), we replace it by the index in which it appears in the list. Then we pop that character from its position in the list and preprend it to the front of the list.
 \begin{align*}
@@ -442,40 +437,45 @@ Now we iterate through \(L\). For each character in \(L\), we replace it by the 
         \end{tabular}
     \end{tabular}
 \end{align*}
-The output of the MTF with input \(L = "ardrcaaaabb"\) is then \("04414300040"\). The usage of MTF encoding after the BWT step was proposed by Burrows and Wheeler. The assumption is that after the BWT step, the data will contain runs of identical characters. In this case the MTF will replace these runs of identical characters by a specific number followed by many zeros. This means that after the MTF step, our data will predominantly contain zeros with occasional breaks of different numbers.
+The output of the \texttt{MTF} with input \(L = "ardrcaaaabb"\) is then \("04414300040"\). The usage of \texttt{MTF} encoding after the \texttt{BWT} step was proposed by Burrows and Wheeler. The assumption is that after the \texttt{BWT} step, the data will contain runs of identical characters. In this case the \texttt{MTF} will replace these runs of identical characters by a specific number followed by many zeros. This means that after the \texttt{MTF} step, our data will predominantly contain zeros with occasional breaks of different numbers.
 % TODO we can initialize the alphabet better so it has more zeros
 
 \subsubsection{Decoding}
 
 
 \subsection{Run-length Encoding}
-The Run-length Encoding (RLE) is an important step in the compression performance of the \(bzip2\) compressor.
-For any type data, if there are sequences of identically repeating characters, there is no need to store all the characters in those sequences of repeating characters. The RLE replaces those sequences with one character identifying what character that sequence is comprised of, and then amount of characters appearing in that sequence.\\
-We show an example of RLE. Assume that we wish to encode "aaaaabbbbcaaaa" using RLE. We know that the string can be represented as being a string consisting of 5 \(a\)'s, 4 \(b\)'s, 1 \(c\) and 4 \(a\)'s. We can write this as the following
+The Run-length Encoding (RLE) is an important step in the compression performance of the \texttt{bzip2} compressor.
+For any type data, if there are sequences of identically repeating characters, there is no need to store all the characters in those sequences of repeating characters. The \texttt{RLE} replaces those sequences with one character identifying what character that sequence is comprised of, and then amount of characters appearing in that sequence.\\
+We show an example of \texttt{RLE}. Assume that we wish to encode "aaaaabbbbcaaaa" using \texttt{RLE}. We know that the string can be represented as being a string consisting of 5 \(a\)'s, 4 \(b\)'s, 1 \(c\) and 4 \(a\)'s. We can write this as the following
 \[
 aaaaabbbbcaaaa \rightarrow 5a4bc4a.
 \]
 This does not remove any information of the data but, only sequences data in order We can reduce this data and simply write the amounts. 
 
 % Here we would know that there are Xas, Ybs, etc.
-The RLE step tries to take advantage of the output of the MTF step. Since as previously mentioned, from the output of the MTF step we can expect our data to contain many sequences of consecutive zeros. The RLE will remove those consecutive zeros and instead write the amount of zeros that will appear in that sequence of zeros.
+The \texttt{RLE} step tries to take advantage of the output of the \texttt{MTF} step. Since as previously mentioned, from the output of the \texttt{MTF} step we can expect our data to contain many sequences of consecutive zeros. The \texttt{RLE} will remove those consecutive zeros and instead write the amount of zeros that will appear in that sequence of zeros.
 
 
 
 
 
 \subsection{Huffman Encoding}
-The last step of \(bzip2\) is the Huffman encoder.
+The last step of \texttt{bzip2} is the Huffman encoder.
 
-\section{Implementation}
+\section{Bzip2 }
 
 \subsection{Multiple Huffman Trees}
-The \(bzip2\) compressor uses multiple Huffman trees in order to efficiently compress the data. The amount of trees it uses is entirely dependent on the size of the data but can be between 2 and 6, although it will usually be 6.
+The \texttt{bzip2} compressor uses multiple Huffman trees in order to efficiently compress the data. The amount of trees it uses is entirely dependent on the size of the data but can be between 2 and 6.
 % TODO: Does below make sense?
-Huffman encoding guarantees symbol-code optimality for the entire data, but it is not necessarily optimal for local segments of the data. For this reason, \(bzip2\) splits the entire text into segments each of size 50 bytes. It then assigns each 
-It starts by partitioning the characters the frequency of characters 
+Huffman encoding guarantees symbol-code optimality for the entire data, but it is not necessarily optimal for individual segments of the data. For this reason, \texttt{bzip2} creates \(n\) initial Huffman trees, that are optimal for symbol partition of the entire data in terms of their frequencies. For example, Huffman tree numbered 0 will initially have optimal codes for the symbols in the interval [0, 1], and then Huffman tree numbered 1 will have optimal codes for [2, 8] etc.
+For each interval, the aim for each Huffman tree is initially to be optimal for \(\frac{100}{n}\%\) of the symbol frequencies. \\
+After this initialization process iterate \texttt{BZ\_N\_ITERS} (which is per default 4) times to improve the trees. For each iteration, we iterate each 50 symbol length segment and find the current cheapest Huffman tree for that segment. That segments symbol frequencies get assigned to its cheapest Huffman tree, and before next iteration we generate the Huffman codes for those frequencies using the Huffman algorithm.
+This gives a way for each Huffman tree to specialize in specific segments of the data, only which are similar to each other in their symbol frequencies.
 
-\section{Experiments?}
+\section{Experiments / Analysis?}
+\subsection{Experimental Setup}
+%We implement the methods presented in 3 to compare compression ratio.
+% The focus is compression ratio, not speed
 \subsection{Run-length encoding}
 
 \subsection{Multiple Huffman}
@@ -483,7 +483,6 @@ It starts by partitioning the characters the frequency of characters
 \section{Conclusion}
 In this thesis, we did.... \\
 Natural future work could include..
-\section{Conclusion}
 
 
 \printbibliography %Prints bibliography
