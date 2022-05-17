@@ -13,12 +13,13 @@ import java.util.Random;
 //      happens when I use arrays.
 
 class EncodeDecode {
-    private static int TREES_IMPROVE_ITER = 3; // Amount of times to improve the huffman trees, default 3
-    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
+    private static int TREES_IMPROVE_ITER = 12; // Amount of times to improve the huffman trees, default 4
+    private static int TREES_COUNT = 8; // Amount of huffman trees, default 6
     private static int BLOCK_SIZE = 50; // Bytes block size, default 50
     private static Boolean RLE = true;
     private static int DEBUG_LEVEL = 0; // 0..5
     private static Boolean showSelectorFrequencies = false;
+    private static Boolean useOurDeltaEncoding = true;
 
 	public static void main(String[] args) throws Exception {
         // Args
@@ -67,9 +68,8 @@ class EncodeDecode {
             System.out.println(arr.length);
         }
         
-        /*
-        String encodedFileName = "encoded.txt";
-        String outFileName = "decoded.txt";
+        String encodedFileName = inFileName + ".mybz2";
+        String outFileName = "silesia/decoded.txt";
         if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
 
         // Write encoded file and read encoded file
@@ -80,18 +80,20 @@ class EncodeDecode {
         arr = decompress(arr, rowId);
         
         // Write decompressed file
-        writeToFile(outFileName, arr);
+        //writeToFile(outFileName, arr);
 
         // Check for errors
+        if (DEBUG_LEVEL >= 1) System.out.println("Checking if equal");
         if (!isEqual(arr, inArr)) {
             System.out.println("ERROR, NOT EQUAL");
             return;
-        }*/
+        }
         
         
 	}
 
     private static void testCorrectnessSteps(String inFileName) throws Exception {
+        /*
         System.out.println("Testing correctness all");
         // Read raw file
         int[] inArr = readFile(inFileName);
@@ -132,6 +134,7 @@ class EncodeDecode {
         writeToFile("out.txt", tempArr);
 
         System.out.println("All working");
+        */
     }
 
 
@@ -144,14 +147,14 @@ class EncodeDecode {
         arr = MoveToFront.encode(arr, RLE);
 
         if (DEBUG_LEVEL >= 1) System.out.println("Multiple Huffman encoding");
-        arr = MultipleHuffman.encode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE, showSelectorFrequencies);
+        arr = MultipleHuffman.encode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE, showSelectorFrequencies, useOurDeltaEncoding);
         
         return arr;
     }
     private static int[] decompress(int[] arr, int[] rowId) throws IOException {
         // Decompression
         if (DEBUG_LEVEL >= 1) System.out.println("Multiple Huffman decoding");
-        int[] tempArr = MultipleHuffman.decode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE);
+        int[] tempArr = MultipleHuffman.decode(arr, TREES_IMPROVE_ITER, TREES_COUNT, BLOCK_SIZE, useOurDeltaEncoding);
 
         if (DEBUG_LEVEL >= 1) System.out.println("MoveToFront & Run-Length decoding");
         tempArr = MoveToFront.decode(tempArr, RLE);

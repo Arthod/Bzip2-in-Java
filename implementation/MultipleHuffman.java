@@ -12,7 +12,7 @@ public class MultipleHuffman {
     private static int CODE_LENGTH_MIN = 0;
 
 
-    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE, boolean showSelectorFrequencies) throws IOException {
+    public static int[] encode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE, boolean showSelectorFrequencies, boolean useOurDeltaEncoding) throws IOException {
         // Count frequency of each character in the text
         int[] frequency = new int[CHAR_MAX + 1];
         for (int i = 0; i < inArr.length; i++) {
@@ -168,45 +168,54 @@ public class MultipleHuffman {
                 if (c == '0')   outBit.writeBit(0);
                 else            outBit.writeBit(1);
             }
-            
-            // runB is assumed to be there
-            int diff = bitLength - codeLengths[i][1];
 
-            if (diff == 0) {
-                outBit.writeBit(0);
-            } else {
-                outBit.writeBit(1);
-                bitLength = bitLength - diff;
-                if (diff > 0) { // Need to increment value
-                    outBit.writeBit(1);
-                } else {
-                    outBit.writeBit(0);
-                }
-                for (int k = 0; k < Math.abs(diff) - 1; k++) {
-                    outBit.writeBit(1);
-                }
-                outBit.writeBit(0);
-            }   
             // Delta encode starting with char 1 from initial bit length.
-            // 0 for same length, 110 for -1, 100 for +1, 1010 for +2, 1110 for -2, etc.         
-            for (int j = 2; j < codeLengths[i].length; j++) {
-                if (symMapLevel2[j - 2]) {
-                    diff = bitLength - codeLengths[i][j];
+            // 0 for same length, 110 for -1, 100 for +1, 1010 for +2, 1110 for -2, etc.
+            int diff;
+            if (useOurDeltaEncoding) {
+                for (int j = 1; j < codeLengths[i].length; j++) {
+                    if (j == 1 || symMapLevel2[j - 2]) {
+                        diff = bitLength - codeLengths[i][j];
 
-                    if (diff == 0) {
-                        outBit.writeBit(0);
-                    } else {
-                        outBit.writeBit(1);
-                        bitLength = bitLength - diff;
-                        if (diff > 0) { // Need to increment value
-                            outBit.writeBit(1);
+                        if (diff == 0) {
+                            outBit.writeBit(0);
                         } else {
+                            outBit.writeBit(1);
+                            bitLength = bitLength - diff;
+                            if (diff > 0) { // Need to increment value
+                                outBit.writeBit(1);
+                            } else {
+                                outBit.writeBit(0);
+                            }
+                            for (int k = 0; k < Math.abs(diff) - 1; k++) {
+                                outBit.writeBit(1);
+                            }
                             outBit.writeBit(0);
                         }
-                        for (int k = 0; k < Math.abs(diff) - 1; k++) {
-                            outBit.writeBit(1);
+                    }
+                }
+            } else {
+                for (int j = 1; j < codeLengths[i].length; j++) {
+                    if (j == 1 || symMapLevel2[j - 2]) {
+                        diff = bitLength - codeLengths[i][j];
+
+                        if (diff == 0) {
+                            outBit.writeBit(0);
+                        } else {
+                            bitLength = bitLength - diff;
+
+                            while (diff < 0) {
+                                outBit.writeBit(1);
+                                outBit.writeBit(1);
+                                diff++;
+                            } 
+                            while (diff > 0) {
+                                outBit.writeBit(1);
+                                outBit.writeBit(0);
+                                diff--;
+                            }
+                            outBit.writeBit(0);
                         }
-                        outBit.writeBit(0);
                     }
                 }
             }
@@ -270,7 +279,7 @@ public class MultipleHuffman {
         return outArrayStream.toIntArray();
     }
     
-    public static int[] decode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE) throws IOException {
+    public static int[] decode(int[] inArr, int TREES_IMPROVE_ITER, int TREES_COUNT, int BLOCK_SIZE, boolean useOurDeltaEncoding) throws IOException {
         // Bit input
         IntArrayInputStream inArrayStream = new IntArrayInputStream(inArr);
         BitInputStream inBit = new BitInputStream(inArrayStream);
@@ -307,59 +316,69 @@ public class MultipleHuffman {
             int codeLength = Integer.parseInt(codeLengthStr, 2);
             codeLengths[i][0] = codeLength;
             codeLengthMax = Math.max(codeLengthMax, codeLength);
-            // If readBit is zero, we stay same code length
-            if (inBit.readBit() == 0) {
-                codeLengths[i][1] = codeLength;
-            } else {
-                // Read next bit, if 1 then negative, 0 then positive
-                int diffSign = inBit.readBit();
-                int count = 1;
-
-                // Continue reading (unary encoded) until we read a zero
-                while (inBit.readBit() == 1) {
-                    count++;
-                }
-
-                // Increment/decrement code length according to this delta
-                if (diffSign == 1)
-                    codeLength -= count;
-                else
-                    codeLength += count;
-
-                // Set
-                codeLengths[i][1] = codeLength;
-                codeLengthMax = Math.max(codeLengthMax, codeLength);
-            }
 
             // Read delta encoded code lengths
-            for (int j = 2; j < codeLengths[i].length; j++) {
-                if (symMapLevel2[j - 2]) {
-                    // If readBit is zero, we stay same code length
-                    if (inBit.readBit() == 0) {
-                        codeLengths[i][j] = codeLength;
-                    } else {
-                        // Read next bit, if 1 then negative, 0 then positive
-                        int diffSign = inBit.readBit();
-                        int count = 1;
+            if (useOurDeltaEncoding) {
+                for (int j = 1; j < codeLengths[i].length; j++) {
+                    if (j == 1 || symMapLevel2[j - 2]) {
+                        // If readBit is zero, we stay same code length
+                        if (inBit.readBit() == 0) {
+                            codeLengths[i][j] = codeLength;
+                        } else {
+                            // Read next bit, if 1 then negative, 0 then positive
+                            int diffSign = inBit.readBit();
+                            int count = 1;
 
-                        // Continue reading (unary encoded) until we read a zero
-                        while (inBit.readBit() == 1) {
-                            count++;
+                            // Continue reading (unary encoded) until we read a zero
+                            while (inBit.readBit() == 1) {
+                                count++;
+                            }
+
+                            // Increment/decrement code length according to this delta
+                            if (diffSign == 1)
+                                codeLength -= count;
+                            else
+                                codeLength += count;
+
+                            // Set
+                            codeLengths[i][j] = codeLength;
+                            codeLengthMax = Math.max(codeLengthMax, codeLength);
                         }
+                    }
+                }
+            } else {
+                for (int j = 1; j < codeLengths[i].length; j++) {
+                    if (j == 1 || symMapLevel2[j - 2]) {
+                        // If readBit is zero, we stay same code length
+                        int readBit = inBit.readBit();
+                        if (readBit == 0) {
+                            codeLengths[i][j] = codeLength;
+                        } else {
+                            int count = 0;
 
-                        // Increment/decrement code length according to this delta
-                        if (diffSign == 1)
+                            // Continue reading (unary encoded) until we read a zero
+                            while (readBit == 1) {
+                                if (inBit.readBit() == 0) {
+                                    count++;
+                                } else {
+                                    count--;
+                                }
+                                readBit = inBit.readBit();
+                            }
+
+                            // Increment/decrement code length according to this delta
                             codeLength -= count;
-                        else
-                            codeLength += count;
 
-                        // Set
-                        codeLengths[i][j] = codeLength;
-                        codeLengthMax = Math.max(codeLengthMax, codeLength);
+                            // Set
+                            codeLengths[i][j] = codeLength;
+                            codeLengthMax = Math.max(codeLengthMax, codeLength);
+                        }
                     }
                 }
             }
         }
+
+        System.out.println("here");
 
         // Generate Huffman trees
         String[][] treeCodes = new String[TREES_COUNT][CHAR_MAX + 1];
