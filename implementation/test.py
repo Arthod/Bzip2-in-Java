@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import subprocess
 
 
-cantrbry_path = "mixcorpora/"
+cantrbry_path = "silesia/"
 filenames = [filename for filename in os.listdir(cantrbry_path) if filename.lower().count("ignore") == 0]
 
 outfile = open('results.txt', 'w')

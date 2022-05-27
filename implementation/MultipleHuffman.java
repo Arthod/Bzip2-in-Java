@@ -378,7 +378,7 @@ public class MultipleHuffman {
             }
         }
 
-        System.out.println("here");
+        //System.out.println("here");
 
         // Generate Huffman trees
         String[][] treeCodes = new String[TREES_COUNT][CHAR_MAX + 1];

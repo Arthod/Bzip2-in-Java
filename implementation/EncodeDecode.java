@@ -13,8 +13,8 @@ import java.util.Random;
 //      happens when I use arrays.
 
 class EncodeDecode {
-    private static int TREES_IMPROVE_ITER = 12; // Amount of times to improve the huffman trees, default 4
-    private static int TREES_COUNT = 8; // Amount of huffman trees, default 6
+    private static int TREES_IMPROVE_ITER = 4; // Amount of times to improve the huffman trees, default 4
+    private static int TREES_COUNT = 6; // Amount of huffman trees, default 6
     private static int BLOCK_SIZE = 50; // Bytes block size, default 50
     private static Boolean RLE = true;
     private static int DEBUG_LEVEL = 0; // 0..5
@@ -68,26 +68,26 @@ class EncodeDecode {
             System.out.println(arr.length);
         }
         
-        String encodedFileName = inFileName + ".mybz2";
-        String outFileName = "silesia/decoded.txt";
-        if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
+        //String encodedFileName = inFileName + ".mybz2";
+        //String outFileName = "silesia/decoded.txt";
+        //if (DEBUG_LEVEL >= 1) System.out.println("Saving to file encoding");
 
         // Write encoded file and read encoded file
-        writeToFile(encodedFileName, arr);
-        arr = readFile(encodedFileName);
+        //writeToFile(encodedFileName, arr);
+        //arr = readFile(encodedFileName);
 
         // Decompres encoded file
-        arr = decompress(arr, rowId);
+        //arr = decompress(arr, rowId);
         
         // Write decompressed file
         //writeToFile(outFileName, arr);
 
         // Check for errors
-        if (DEBUG_LEVEL >= 1) System.out.println("Checking if equal");
-        if (!isEqual(arr, inArr)) {
-            System.out.println("ERROR, NOT EQUAL");
-            return;
-        }
+        //if (DEBUG_LEVEL >= 1) System.out.println("Checking if equal");
+        //if (!isEqual(arr, inArr)) {
+        //    System.out.println("ERROR, NOT EQUAL");
+        //    return;
+        //}
         
         
 	}

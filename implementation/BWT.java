@@ -1,3 +1,7 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -268,5 +272,78 @@ public class BWT {
         int temp = arr[index1];
         arr[index1] = arr[index2];
         arr[index2] = temp;
+    }
+
+    private static float countAverageIdenticalRuns(int[] arr) {
+        ArrayList<Integer> arrList = new ArrayList<Integer>();
+        int runLength = 0;
+        int runChar = arr[0];
+
+        // Calculate run lengths
+        for (int i = 0; i < arr.length; i++) {
+            if (runChar == arr[i]) {
+                runLength++;
+            } else {
+                arrList.add(runLength);
+                runLength = 1;
+                runChar = arr[i];
+            }
+        }
+        arrList.add(runLength);
+
+        // Calculate average
+        float sum = 0;
+        for (int i = 0; i < arrList.size(); i++) {
+            sum += arrList.get(i);
+        }
+        return sum / arrList.size();
+    }
+    private static int[] readFile(String inFileName) throws IOException {
+        FileInputStream inFile = new FileInputStream(inFileName);
+
+        // Turn inFile into array
+        int bytesAmount = (int) inFile.getChannel().size();
+        int[] arr = new int[bytesAmount];
+        
+        // Iterate through all bytes in file and write to array
+        for (int i = 0; i < bytesAmount; i++) {
+            arr[i] = inFile.read();
+        }
+        inFile.close();
+
+        return arr;
+    }
+
+    public static void main(String[] args) throws IOException {
+        String[] fileNames = {"dickens", "mozilla", "mr", "nci", "ooffice", "osdb", "reymont", "samba", "sao", "webster", "xml", "x-ray"};
+        float iterations = 10;
+
+        for (String fileName : fileNames) {
+            System.out.println(fileName);
+            int[] arr = readFile("silesia/" + fileName);
+            
+            int readBytes = Math.round(arr.length / iterations);
+            while (true) {
+                int[] newArr = new int[readBytes];
+                int[] rowId = new int[1];
+                for (int i = 0; i < readBytes; i++) {
+                    newArr[i] = arr[i];
+                }
+
+                newArr = transform(newArr, rowId);
+                
+                System.out.print(countAverageIdenticalRuns(newArr) + ", ");
+
+
+                if (readBytes == arr.length) {
+                    break;
+                } else {
+                    readBytes = Math.min(arr.length, readBytes + Math.round(arr.length / iterations));
+                }
+            }
+            System.out.println();
+
+        }
+
     }
 }
