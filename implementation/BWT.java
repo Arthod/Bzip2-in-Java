@@ -316,7 +316,7 @@ public class BWT {
 
     public static void main(String[] args) throws IOException {
         String[] fileNames = {"dickens", "mozilla", "mr", "nci", "ooffice", "osdb", "reymont", "samba", "sao", "webster", "xml", "x-ray"};
-        float iterations = 10;
+        float iterations = 100;
 
         for (String fileName : fileNames) {
             System.out.println(fileName);
@@ -341,6 +341,7 @@ public class BWT {
                     readBytes = Math.min(arr.length, readBytes + Math.round(arr.length / iterations));
                 }
             }
+            System.out.println();
             System.out.println();
 
         }
