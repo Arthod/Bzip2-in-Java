@@ -59,14 +59,25 @@ class EncodeDecode {
 
         // Read raw file
         int[] inArr = readFile(inFileName);
+        System.out.println("Read file");
         int[] rowId = new int[1];
 
-        // Compress raw file
-        int[] arr = compress(inArr, rowId);
-        
-        if (!showSelectorFrequencies) {
-            System.out.println(arr.length);
+        int[] tempArr = inArr.clone();
+        //tempArr = BWT.transform(inArr, rowId);
+        //tempArr = MoveToFront.encode(tempArr, false);
+
+        int[] count = new int[258];
+        for (int i = 0; i < tempArr.length; i++) {
+            count[tempArr[i]]++;
         }
+        System.out.println(Arrays.toString(count));
+
+        // Compress raw file
+        //int[] arr = compress(inArr, rowId);
+        
+        //if (!showSelectorFrequencies) {
+        //    System.out.println(arr.length);
+        //}
         
         //String encodedFileName = inFileName + ".mybz2";
         //String outFileName = "silesia/decoded.txt";

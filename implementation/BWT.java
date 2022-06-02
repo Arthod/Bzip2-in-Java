@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 // TODO see if sArr can be removed.. I assume it can
@@ -274,7 +275,7 @@ public class BWT {
         arr[index2] = temp;
     }
 
-    private static float countAverageIdenticalRuns(int[] arr) {
+    private static ArrayList<Integer> countRuns(int[] arr) {
         ArrayList<Integer> arrList = new ArrayList<Integer>();
         int runLength = 0;
         int runChar = arr[0];
@@ -290,14 +291,34 @@ public class BWT {
             }
         }
         arrList.add(runLength);
-
-        // Calculate average
-        float sum = 0;
-        for (int i = 0; i < arrList.size(); i++) {
-            sum += arrList.get(i);
-        }
-        return sum / arrList.size();
+        
+        return arrList;
     }
+
+    private static double average(ArrayList<Integer> runsList) {
+        // Calculate average
+        double sum = 0;
+        for (int i = 0; i < runsList.size(); i++) {
+            int val = runsList.get(i);
+            sum += val;
+        }
+        return sum / runsList.size();
+    }
+    private static double median(ArrayList<Integer> runsList) {
+        System.out.println(runsList.toString());
+        Collections.sort(runsList);
+
+        if (runsList.size() % 2 == 1)
+            return runsList.get((runsList.size() + 1) / 2 - 1);
+        else {
+            double lower = runsList.get(runsList.size() / 2 - 1);
+            double upper = runsList.get(runsList.size() / 2);
+
+            return (lower + upper) / 2.0;
+        }
+    }
+
+
     private static int[] readFile(String inFileName) throws IOException {
         FileInputStream inFile = new FileInputStream(inFileName);
 
@@ -316,7 +337,7 @@ public class BWT {
 
     public static void main(String[] args) throws IOException {
         String[] fileNames = {"dickens", "mozilla", "mr", "nci", "ooffice", "osdb", "reymont", "samba", "sao", "webster", "xml", "x-ray"};
-        float iterations = 100;
+        float iterations = 10;
 
         for (String fileName : fileNames) {
             System.out.println(fileName);
@@ -331,11 +352,12 @@ public class BWT {
                 }
 
                 newArr = transform(newArr, rowId);
+                ArrayList<Integer> runsList = countRuns(arr);
                 
-                System.out.print(countAverageIdenticalRuns(newArr) + ", ");
+                System.out.print(median(runsList) + ", ");
 
 
-                if (readBytes == arr.length) {
+                if (readBytes >= arr.length) {
                     break;
                 } else {
                     readBytes = Math.min(arr.length, readBytes + Math.round(arr.length / iterations));
