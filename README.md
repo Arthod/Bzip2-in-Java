@@ -3,6 +3,7 @@
 Implementation of several methods for data transforming and compression. 
 
 These methods are used in Bzip2 and are described in the 1994 paper by Burrows and Wheeler.
+
 Compression (with decompression having reverse order)
 1. Burrows-Wheeler Transform
 2. Move-To-Front Transform
