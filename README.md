@@ -10,6 +10,10 @@ Compression (with decompression having reverse order)
 3. Run-Length Encoding
 4. Huffman Encoding (using Multiple Huffman tables)
 
+## Bachelor thesis
+Lossless File Compression with bzip2
+https://github.com/Arthod/Bzip2-in-Java/blob/main/report/project.pdf
+
 ## References
 https://www.hpl.hp.com/techreports/Compaq-DEC/SRC-RR-124.pdf
 https://www.sourceware.org/bzip2/manual/manual.pdf
